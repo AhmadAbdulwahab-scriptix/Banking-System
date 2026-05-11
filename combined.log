@@ -1,0 +1,54 @@
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:23:56.067Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:23:56.073Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:25:55.587Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:25:55.594Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:28:21.989Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:28:21.995Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:30:40.821Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:30:40.832Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:30:58.609Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:30:58.610Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:32:34.021Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:32:34.022Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:33:53.867Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:33:53.875Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:34:21.169Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:34:21.173Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:36:25.157Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:36:25.162Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:38:19.413Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:38:19.420Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:42:25.178Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:42:25.229Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:43:54.063Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:43:54.069Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:45:31.613Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:45:31.619Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:51:41.668Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:51:41.680Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-10T23:53:04.824Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:53:04.831Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:53:53.437Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:53:53.437Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:54:32.595Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:54:32.610Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:55:37.614Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:55:37.621Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:55:59.565Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:55:59.566Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:56:15.472Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:56:15.473Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-10T23:56:29.790Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-10T23:56:29.799Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T00:02:17.038Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:02:17.042Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T00:03:02.636Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:03:02.640Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-11T00:05:20.056Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:05:20.059Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T00:10:50.854Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:10:50.857Z"}
+{"level":"info","message":"Received POST request to /api/auth/register","service":"src","timestamp":"2026-05-11T00:13:32.213Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:13:32.216Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T00:14:10.863Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:14:10.864Z"}
