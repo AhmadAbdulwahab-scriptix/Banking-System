@@ -32,13 +32,13 @@ const comparePassword = async (password, userPassword) => {
 // Function to generate JWT token
 const generateToken = (userId) => {   
     try {
-         if (!process.env.JWT_SECRET) {
-        throw new Error("JWT_SECRET is not defined");
+         if (!process.env.ACCESS_TOKEN_SECRET) {
+        throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
         const token = jwt.sign(          
             { userId: userId }, // Payload containing user information
             
-            process.env.JWT_SECRET, // Secret key for signing the token
+            process.env.ACCESS_TOKEN_SECRET, // Secret key for signing the token
             
             { expiresIn: '7d' } // Token expiration time
         );
@@ -64,8 +64,8 @@ const  signToken = (user) => {
             role: user.role,
             isVerified: user.isVerified
         },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '7d' }
     );
 }
 

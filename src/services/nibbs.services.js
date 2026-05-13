@@ -1,8 +1,39 @@
+const axios = require("axios");
+let cachedToken = null;
+let tokenExpiry = null;
+
+const getNibssToken = async () => {
+    const now = Date.now();
+
+    // Return cached token if still valid (60s buffer before expiry)
+    if (cachedToken && tokenExpiry && now < tokenExpiry - 60_000) {
+        return cachedToken;
+    }
+
+    const response = await axios.post(
+        `${process.env.NIBSS_BASE_URL}/api/auth/token`,
+        {
+            apiKey: process.env.NIBSS_API_KEY,
+            apiSecret: process.env.NIBSS_API_SECRET, // ← add this to your .env
+        },
+        {
+            headers: { "Content-Type": "application/json" },
+        }
+    );
+
+    cachedToken = response.data.token;
+    tokenExpiry = now + 3600_000; // Token is valid for 1 hour per the docs
+
+    return cachedToken;
+};
+
 const API = axios.create({
-    baseURL: process.env.NIBSS_BASE_URL,
-    headers: {
-        "Content-Type": "application/json",
-    },
+  baseURL: process.env.NIBSS_BASE_URL,
+  headers: {
+    "x-api-key": process.env.NIBSS_API_KEY,
+    "Content-Type": "application/json",
+  },
+   withCredentials: true,
 });
 
 // Attach fresh Bearer token to every request
@@ -32,32 +63,32 @@ API.interceptors.response.use(
     }
 );
 
-export const verifyBVN = async (bvn) => {
+const verifyBVN = async (bvn) => {
     const response = await API.post(`/api/validateBvn`, { bvn });
     return response.data;
 };
 
-export const validateNIN = async (nin) => {
+const validateNIN = async (nin) => {
     const response = await API.post(`/api/validateNin`, { nin });
     return response.data;
 };
 
-export const nameEnquiry = async (account_number) => {
+const nameEnquiry = async (account_number) => {
     const response = await API.get(`/api/account/name-enquiry/${account_number}`);
     return response.data;
 };
 
-export const interbankTransfer = async (payload) => {
+const interbankTransfer = async (payload) => {
     const response = await API.post("/api/transfer", payload);
     return response.data;
 };
 
-export const dashboard = async () => {
+const dashboard = async () => {
     const response = await API.get("/api/fintech/onboard");
     return response.data;
 };
 
-export default {
+module.exports = {
     interbankTransfer,
     nameEnquiry,
     verifyBVN,

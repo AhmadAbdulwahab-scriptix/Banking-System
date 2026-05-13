@@ -52,3 +52,131 @@
 {"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:13:32.216Z"}
 {"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T00:14:10.863Z"}
 {"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T00:14:10.864Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T10:44:59.002Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T10:44:59.020Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-11T15:16:52.548Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-11T15:16:52.569Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-13T00:35:12.102Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:35:12.128Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:40:33.458Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:40:33.471Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:42:45.428Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:42:45.460Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:44:17.809Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:44:17.818Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:45:01.324Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:45:01.332Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-13T00:45:33.873Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:45:33.874Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:46:14.074Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:46:14.075Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:46:58.144Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:46:58.145Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:47:15.161Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:47:15.161Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:52:35.576Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:52:35.608Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T00:54:54.417Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T00:54:54.422Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:00:41.436Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:00:41.442Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:00:50.678Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:00:50.679Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:02:00.322Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:02:00.329Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:07:26.922Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:07:26.933Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:07:36.169Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:07:36.170Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:08:49.893Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:08:49.905Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:11:57.669Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:11:57.681Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:12:29.665Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:12:29.675Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:14:37.346Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:14:37.357Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:16:02.772Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:16:02.781Z"}
+{"level":"info","message":"Received POST request to /api/wallet/create","service":"src","timestamp":"2026-05-13T01:17:26.764Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:17:26.774Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:22:41.680Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:22:41.692Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:24:58.969Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:24:58.977Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:25:21.330Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:25:21.341Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:26:45.494Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:26:45.504Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:27:17.761Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:27:17.770Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:28:00.784Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:28:00.794Z"}
+{"level":"info","message":"Received POST request to /api/wallet/verify-bvn","service":"src","timestamp":"2026-05-13T01:31:17.512Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T01:31:17.524Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T01:32:18.852Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:32:18.854Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T01:33:11.351Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:33:11.352Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T01:34:16.688Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:34:16.697Z"}
+{"level":"info","message":"Received GET request to /api/wallet/6a011f2c191376bb8fb29201","service":"src","timestamp":"2026-05-13T01:35:07.415Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:35:07.416Z"}
+{"level":"info","message":"Received GET request to /api/wallet/6a011f2c191376bb8fb29201","service":"src","timestamp":"2026-05-13T01:36:30.410Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:36:30.420Z"}
+{"level":"info","message":"Received GET request to /api/wallet/6a011f2c191376bb8fb29201","service":"src","timestamp":"2026-05-13T01:38:54.000Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:38:54.008Z"}
+{"level":"info","message":"Received GET request to /api/wallet/6a011f2c191376bb8fb29201","service":"src","timestamp":"2026-05-13T01:43:35.023Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:43:35.057Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T01:43:46.339Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:43:46.340Z"}
+{"level":"info","message":"Received GET request to /api/wallet/6a03d127864cf590ae19d972","service":"src","timestamp":"2026-05-13T01:44:26.542Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:44:26.544Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T01:45:10.210Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:45:10.211Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T01:45:40.569Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:45:40.578Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T01:57:06.468Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:57:06.510Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T01:58:45.679Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T01:58:45.687Z"}
+{"level":"info","message":"Received POST request to /api/wallet/transfer","service":"src","timestamp":"2026-05-13T02:03:18.846Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T02:03:18.856Z"}
+{"level":"info","message":"Received POST request to /api/wallet/transfer","service":"src","timestamp":"2026-05-13T04:13:27.269Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T04:13:27.303Z"}
+{"level":"info","message":"Received POST request to /api/wallet/transfer","service":"src","timestamp":"2026-05-13T04:14:38.542Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T04:14:38.544Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:15:49.546Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:15:49.547Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:17:53.347Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:17:53.351Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:28:22.303Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:28:22.325Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:29:24.051Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:29:24.058Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:31:34.157Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:31:34.161Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:36:30.818Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:36:30.823Z"}
+{"level":"info","message":"Received POST request to /api/auth/login","service":"src","timestamp":"2026-05-13T04:36:38.453Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T04:36:38.454Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T04:36:56.386Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:36:56.387Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T04:37:04.464Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:37:04.464Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T04:51:30.413Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:51:30.420Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T04:53:09.187Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:53:09.191Z"}
+{"level":"info","message":"Received GET request to /api/wallet","service":"src","timestamp":"2026-05-13T04:56:48.055Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:56:48.061Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:57:17.443Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:57:17.444Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/4402995272","service":"src","timestamp":"2026-05-13T04:59:28.129Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T04:59:28.135Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/1234567890","service":"src","timestamp":"2026-05-13T05:02:05.339Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T05:02:05.343Z"}
+{"level":"info","message":"Received GET request to /api/wallet/name-enquiry/0987654321","service":"src","timestamp":"2026-05-13T05:02:19.833Z"}
+{"level":"info","message":"Request Body, undefined","service":"src","timestamp":"2026-05-13T05:02:19.833Z"}
+{"level":"info","message":"Received POST request to /api/wallet/transfer","service":"src","timestamp":"2026-05-13T05:02:40.512Z"}
+{"level":"info","message":"Request Body, [object Object]","service":"src","timestamp":"2026-05-13T05:02:40.516Z"}
