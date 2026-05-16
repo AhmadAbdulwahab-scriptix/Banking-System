@@ -6,7 +6,7 @@ const generateTxRef = async (Transaction) => {
     let exists = true
     while (exists) {
         num = crypto.randomInt(1000000000000, 9999999999999);
-        exists = await Trasansaction.exists({ accountNumber });
+        exists = await Transaction.exists({ reference: `TX${num}` });
     }
     
     
