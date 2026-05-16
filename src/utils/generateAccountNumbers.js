@@ -16,7 +16,6 @@ const Wallet = require("../models/Wallet.model");
 const generateAccountNumber = async () => {
   let accountNumber; // Declare variable to hold the generated account number
   let exists = true; // Initialize to true to enter the loop
- 
   while (exists) {
     // Generate a random 10-digit number
     accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
@@ -25,6 +24,4 @@ const generateAccountNumber = async () => {
   return accountNumber; // Return the unique account number
 };
 
-module.exports = {
-    generateAccountNumber
-};
+module.exports = { generateAccountNumber };

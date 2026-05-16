@@ -28,12 +28,12 @@ const getNibssToken = async () => {
 };
 
 const API = axios.create({
-  baseURL: process.env.NIBSS_BASE_URL,
-  headers: {
-    "x-api-key": process.env.NIBSS_API_KEY,
-    "Content-Type": "application/json",
-  },
-   withCredentials: true,
+    baseURL: process.env.NIBSS_BASE_URL,
+    headers: {
+        // "x-api-key": process.env.NIBSS_API_KEY,
+        "Content-Type": "application/json",
+    },
+    withCredentials: true,
 });
 
 // Attach fresh Bearer token to every request
@@ -63,7 +63,7 @@ API.interceptors.response.use(
     }
 );
 
-const verifyBVN = async (bvn) => {
+const validateBVN = async (bvn) => {
     const response = await API.post(`/api/validateBvn`, { bvn });
     return response.data;
 };
@@ -88,10 +88,22 @@ const dashboard = async () => {
     return response.data;
 };
 
+const transactionStatus = async (reference) => {
+    const response = await API.get(`/api/transaction/${reference}`)
+    return response.data
+}
+
+const createAccount = async (payload) => {
+    const response = await API.post("/api/account/create", payload);
+    return response.data.account.accountNumber
+}
+
 module.exports = {
     interbankTransfer,
     nameEnquiry,
-    verifyBVN,
+    validateBVN,
     validateNIN,
     dashboard,
+    transactionStatus,
+    createAccount
 };

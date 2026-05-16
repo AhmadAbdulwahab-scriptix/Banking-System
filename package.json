@@ -2,9 +2,8 @@
   "name": "banking-system",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
@@ -24,6 +23,7 @@
     "axios": "^1.16.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
+    "crypto": "^1.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",

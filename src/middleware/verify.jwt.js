@@ -19,9 +19,8 @@ const verifyJWT = (req, res, next) => {
             req.isVerified = decoded.userInfo.isVerified;
             req.role = decoded.userInfo.role
             next();
-
-  } catch (error) {
-    return next(new AppError('Invalid token. Please log in again.', 401));
+  } catch (err) {
+    return res.status(401).json({ success: false, message: 'Invalid token. Please log in again.' })
   };
 }
 

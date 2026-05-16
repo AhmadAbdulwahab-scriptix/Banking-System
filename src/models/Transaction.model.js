@@ -27,6 +27,12 @@ const transactionSchema = new Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",
     },
+    
+    externalReceiverAccount: {
+      type: String,
+      minlength: 10,
+      maxlength: 10
+    },
 
     amount: {
         type: Number, 

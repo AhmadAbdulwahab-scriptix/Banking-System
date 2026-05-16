@@ -3,8 +3,7 @@ const { mainModule } = require('node:process');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-
-   firstName: {
+    firstName: {
         type: String,
         required: true,
         trim: true

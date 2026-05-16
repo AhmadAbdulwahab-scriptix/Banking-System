@@ -1,4 +1,3 @@
-// const AppError = require('../utils/AppError')
 const {AppError} = require('./errorHandler.middleware');
 
 const verifyRoles = (...roles) => {

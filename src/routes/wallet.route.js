@@ -10,11 +10,11 @@ router.post("/verify-nin", Wallet.verifyNIN);
 
 router.get("/name-enquiry/:accountNumber", Wallet.nameEnquiry);
 
-router.post("/transfer", Wallet.interbankTransfer);
-
 router.get("/", Wallet.getWallet)
 
 router.get("/:walletId", Wallet.getWalletById)
+
+//router.post("/transfer", Wallet.interbankTransfer);
 
 // router.get("/:walletId", Wallet.getWalletById);
 
