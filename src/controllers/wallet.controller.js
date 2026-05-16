@@ -22,16 +22,20 @@ const createWallet = async (req, res) => {
         success: false, 
         message: "userId is required." 
       });
-    };
+    }
 
-    // Prevent duplicate wallets for the same user + currency combo
-    const existingWallet = await Wallet.findOne({ 
-      user: userId, currency: currency || "NGN" 
-    });
-    console.log("Wallet Model =>", Wallet);
+    // 1️⃣ Check for existing wallet
+    let existingWallet;
+    try {
+      existingWallet = await Wallet.findOne({ 
+        user: userId, 
+        currency: currency || "NGN" 
+      });
+    } catch (walletCheckErr) {
+      console.error('[Wallet.findOne] Wallet check failed:', walletCheckErr.message);
+      throw walletCheckErr;
+    }
 
-    // Note: If you want to allow multiple wallets per user but only one per currency, 
-    // adjust the schema and this check accordingly.
     if (existingWallet) {
       return res.status(409).json({
         success: false,
@@ -39,22 +43,50 @@ const createWallet = async (req, res) => {
       });
     }
     
-    const user = await User.findById(userId)
+    // 2️⃣ Fetch user details
+    let user;
+    try {
+      user = await User.findById(userId);
+    } catch (userErr) {
+      console.error('[User.findById] User fetch failed:', userErr.message);
+      throw userErr;
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // 3️⃣ EXTERNAL API - Create Account
     const payload = {
       kycType: user?.kycType?.toLowerCase(),
       kycID: user?.bvn || user?.nin,
       dob: user?.dob
-    }    
+    };
+    
+    let accountNumber;
     try {
-      const accountNumber = await createAccount(payload);
-      console.log(accountNumber);
-    } catch (err) {
-      if (err.response?.status === 404) {
-        return res.status(404).json({ success: false, message: "Account number not found" }) 
+      accountNumber = await createAccount(payload);
+    } catch (createAccountErr) {
+      console.error('[createAccount] NIBSS API failed:', createAccountErr.message);
+      if (createAccountErr.response?.status === 404) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Account creation failed - KYC data not found" 
+        });
       }
-      return res.status(500).json({ success: false, message: err.response.data });
+      if (createAccountErr.response?.status === 400) {
+        return res.status(400).json({ 
+          success: false, 
+          message: createAccountErr.response?.data || "Invalid KYC data"
+        });
+      }
+      throw createAccountErr;
     }
 
+    // 4️⃣ DATABASE - Create Wallet Record
     const wallet = new Wallet({
       user: userId,
       accountNumber,
@@ -63,7 +95,12 @@ const createWallet = async (req, res) => {
       status: "Pending",
     });
 
-    await wallet.save();
+    try {
+      await wallet.save();
+    } catch (walletSaveErr) {
+      console.error('[wallet.save] Wallet creation failed:', walletSaveErr.message);
+      throw walletSaveErr;
+    }
 
     return res.status(201).json({ 
         success: true, 
@@ -72,12 +109,10 @@ const createWallet = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("CREATE WALLET ERROR:", error);
+    console.error("[createWallet] Unexpected error:", error.message || error);
     return res.status(500).json({ 
         success: false, 
-        message: "Unable to create wallet",
-        error: error.message, 
-        errorStack: error.stack
+        message: "Unable to create wallet"
     });
   }
 };
@@ -98,11 +133,20 @@ const verifyBVN = async (req, res) => {
     });
     }
 
-    const wallet = await Wallet.findOne({ user: userId });
+    // 1️⃣ Fetch wallet
+    let wallet;
+    try {
+      wallet = await Wallet.findOne({ user: userId });
+    } catch (walletErr) {
+      console.error('[Wallet.findOne] Wallet fetch failed:', walletErr.message);
+      throw walletErr;
+    }
+
     if (!wallet) {
       return res.status(404).json({ 
         success: false, 
-        message: "Wallet not found" });
+        message: "Wallet not found" 
+      });
     }
 
     if (["Suspended", "Frozen", "Closed"].includes(wallet.status)) {
@@ -112,11 +156,35 @@ const verifyBVN = async (req, res) => {
       });
     }
 
-    const nibssResponse = await verifyBVN(bvn);
+    // 2️⃣ EXTERNAL API - Verify BVN
+    let nibssResponse;
+    try {
+      nibssResponse = await validateBVN(bvn);
+    } catch (validateErr) {
+      console.error('[validateBVN] NIBSS API failed:', validateErr.message);
+      if (validateErr.response?.status === 400) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid BVN provided"
+        });
+      }
+      if (validateErr.response?.status === 404) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "BVN not found on NIBSS"
+        });
+      }
+      throw validateErr;
+    }
 
-    // Activate wallet after successful BVN verification
+    // 3️⃣ DATABASE - Update Wallet Status
     wallet.status = "Active";
-    await wallet.save();
+    try {
+      await wallet.save();
+    } catch (updateErr) {
+      console.error('[wallet.save] Wallet status update failed:', updateErr.message);
+      throw updateErr;
+    }
 
     return res.status(200).json({
       success: true,
@@ -124,30 +192,10 @@ const verifyBVN = async (req, res) => {
       data: { wallet, nibssData: nibssResponse },
     });
   } catch (error) {
-    console.error("verifyBVN error:", error);
-
-    if (error.response?.status === 400) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Invalid BVN provided",
-        error: error.message,
-        ErrorStack: error.stack 
-    });
-    }
-    if (error.response?.status === 404) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "BVN not found on NIBSS",
-        error: error.message,
-        ErrorStack: error.stack  
-      });
-    }
-
+    console.error("[verifyBVN] Unexpected error:", error.message || error);
     return res.status(500).json({ 
         success: false, 
-        message: "BVN verification failed",
-        error: error.message,
-        ErrorStack: error.stack 
+        message: "BVN verification failed"
     });
   }
 };
@@ -158,20 +206,30 @@ const verifyBVN = async (req, res) => {
  */
 const verifyNIN = async (req, res) => {
   try {
-    console.log(true);
-    
     const { nin } = req.body;
     const { userId } = req;
-    console.log(userId);
-    
 
     if (!nin) {
-      return res.status(400).json({ success: false, message: "NIN is required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "NIN is required" 
+      });
     }
 
-    const wallet = await Wallet.findOne({ user: userId });
+    // 1️⃣ Fetch wallet
+    let wallet;
+    try {
+      wallet = await Wallet.findOne({ user: userId });
+    } catch (walletErr) {
+      console.error('[Wallet.findOne] Wallet fetch failed:', walletErr.message);
+      throw walletErr;
+    }
+
     if (!wallet) {
-      return res.status(404).json({ success: false, message: "Wallet not found" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "Wallet not found" 
+      });
     }
 
     if (["Suspended", "Frozen", "Closed"].includes(wallet.status)) {
@@ -181,11 +239,35 @@ const verifyNIN = async (req, res) => {
       });
     }
 
-    const nibssResponse = await validateNIN(nin);
-    console.log(nibssResponse);
+    // 2️⃣ EXTERNAL API - Verify NIN
+    let nibssResponse;
+    try {
+      nibssResponse = await validateNIN(nin);
+    } catch (validateErr) {
+      console.error('[validateNIN] NIBSS API failed:', validateErr.message);
+      if (validateErr.response?.status === 400) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid NIN provided" 
+        });
+      }
+      if (validateErr.response?.status === 404) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "NIN not found on NIBSS" 
+        });
+      }
+      throw validateErr;
+    }
     
+    // 3️⃣ DATABASE - Update Wallet Status
     wallet.status = "Active";
-    await wallet.save();
+    try {
+      await wallet.save();
+    } catch (updateErr) {
+      console.error('[wallet.save] Wallet status update failed:', updateErr.message);
+      throw updateErr;
+    }
 
     return res.status(200).json({
       success: true,
@@ -193,16 +275,11 @@ const verifyNIN = async (req, res) => {
       data: { wallet, nibssData: nibssResponse },
     });
   } catch (error) {
-    console.error("verifyNIN error:", error);
-
-    if (error.response?.status === 400) {
-      return res.status(400).json({ success: false, message: "Invalid NIN provided" });
-    }
-    if (error.response?.status === 404) {
-      return res.status(404).json({ success: false, message: "NIN not found on NIBSS" });
-    }
-
-    return res.status(500).json({ success: false, message: "NIN verification failed" });
+    console.error("[verifyNIN] Unexpected error:", error.message || error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "NIN verification failed" 
+    });
   }
 };
 
@@ -220,7 +297,21 @@ const enquireName = async (req, res) => {
         message: "Account number is required" 
     });
     }
-    const nibssResponse = await nameEnquiry(accountNumber);
+
+    // 1️⃣ EXTERNAL API - Name Enquiry
+    let nibssResponse;
+    try {
+      nibssResponse = await nameEnquiry(accountNumber);
+    } catch (enquiryErr) {
+      console.error('[nameEnquiry] NIBSS API failed:', enquiryErr.message);
+      if (enquiryErr.response?.status === 404) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Account number not found" 
+        });
+      }
+      throw enquiryErr;
+    }
 
     return res.status(200).json({
       success: true,
@@ -229,15 +320,7 @@ const enquireName = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("nameEnquiry error:", error);
-
-    if (error.response?.status === 404) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Account number not found" 
-    });
-    }
-
+    console.error("[enquireName] Unexpected error:", error.message || error);
     return res.status(500).json({ 
         success: false, 
         message: "Name enquiry failed" 
@@ -251,7 +334,14 @@ const enquireName = async (req, res) => {
  */
 const getWallet = async (req, res) => {
   try {
-    const wallet = await Wallet.findOne({ user: req.userId }).populate("user", "name email");
+    // 1️⃣ DATABASE - Fetch wallet with user details
+    let wallet;
+    try {
+      wallet = await Wallet.findOne({ user: req.userId }).populate("user", "name email");
+    } catch (walletErr) {
+      console.error('[Wallet.findOne] Wallet fetch failed:', walletErr.message);
+      throw walletErr;
+    }
 
     if (!wallet) {
       return res.status(404).json({ 
@@ -266,11 +356,11 @@ const getWallet = async (req, res) => {
     });
 
   } catch (error) {
-
-    console.error("getWallet error:", error);
+    console.error("[getWallet] Unexpected error:", error.message || error);
     return res.status(500).json({ 
         success: false, 
-        message: "Internal server error" });
+        message: "Internal server error" 
+    });
   }
 };
 
@@ -282,14 +372,21 @@ const getWalletById = async (req, res) => {
   try {
     const { walletId } = req.params;
     
-    // Populate user details (name, email) for better context in responses.
-    const wallet = await Wallet.findById(walletId).populate("user", "name email");
+    // 1️⃣ DATABASE - Fetch wallet by ID
+    let wallet;
+    try {
+      wallet = await Wallet.findById(walletId).populate("user", "name email");
+    } catch (walletErr) {
+      console.error('[Wallet.findById] Wallet fetch failed:', walletErr.message);
+      throw walletErr;
+    }
 
     if (!wallet) {
       return res.status(404).json({ 
         success: false, 
-        message: "Wallet not found." });
-    };
+        message: "Wallet not found." 
+      });
+    }
 
     return res.status(200).json({ 
         success: true, 
@@ -297,14 +394,13 @@ const getWalletById = async (req, res) => {
     });
 
   } catch (error) {
-
+    console.error("[getWalletById] Unexpected error:", error.message || error);
     return res.status(500).json({ 
         success: false, 
-        message: error.message });
+        message: "Internal server error" 
+    });
   }
 };
-
-
 
 /**
  * PATCH /wallet/status
@@ -325,17 +421,24 @@ const updateWalletStatus = async (req, res) => {
       });
     }
 
-    const wallet = await Wallet.findOneAndUpdate(
-      { user: userId },
-      { status },
-      { new: true }
-    );
+    // 1️⃣ DATABASE - Update Wallet Status
+    let wallet;
+    try {
+      wallet = await Wallet.findOneAndUpdate(
+        { user: userId },
+        { status },
+        { new: true }
+      );
+    } catch (updateErr) {
+      console.error('[Wallet.findOneAndUpdate] Wallet status update failed:', updateErr.message);
+      throw updateErr;
+    }
 
     if (!wallet) {
       return res.status(404).json({ 
         success: false, 
         message: "Wallet not found" 
-    });
+      });
     }
 
     return res.status(200).json({
@@ -344,431 +447,12 @@ const updateWalletStatus = async (req, res) => {
       data: wallet,
     });
   } catch (error) {
-    console.error("updateWalletStatus error:", error);
+    console.error("[updateWalletStatus] Unexpected error:", error.message || error);
     return res.status(500).json({ 
         success: false, 
-        message: "Internal server error" });
+        message: "Internal server error" 
+    });
   }
 };
 
-module.exports = { createWallet, verifyBVN, verifyNIN, nameEnquiry, getWallet, getWalletById, updateWalletStatus }
-
-
-
-//------------------------------------------------------- Old Endpoints
-//
-/**
- * GET /wallets/user/:userId
- * Get all wallets belonging to a user.
- */
-// exports.getWalletsByUser = async (req, res) => {
-//   try {
-//     const { userId } = req.params;  // Extract userId from route parameters
-
-//     const wallets = await Wallet.find({ user: userId }); // Query wallets by user ID
-
-//     return res.status(200).json({ 
-//         success: true, 
-//         count: wallets.length, 
-//         data: wallets 
-//     });
-//   } catch (error) {
-
-//     return res.status(500).json({ 
-//         success: false, 
-//         message: error.message 
-//     });
-//   }
-// };
-
-/**
- * PATCH /wallets/:walletId/status
- * Update the status of a wallet (admin use).
- * Allowed transitions are loosely validated here — tighten as needed.
- */
-// exports.updateWalletStatus = async (req, res) => {
-//   try {
-//     const { status } = req.body;
-//     const VALID_STATUSES = ["Pending", "Active", "Suspended", "Frozen", "Closed", "Dormant"];
-
-//     if (!VALID_STATUSES.includes(status)) {
-//       return res.status(400).json({
-//         success: false,
-//         message: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}`,
-//       });
-//     }
-
-//     const wallet = await Wallet.findByIdAndUpdate(
-//       req.params.walletId,
-//       { status },
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!wallet) {
-//       return res.status(404).json({ 
-//         success: false, 
-//         message: "Wallet not found." 
-//       });
-//     }
-
-//     return res.status(200).json({ 
-//         success: true, 
-//         data: wallet 
-//     });
-
-//   } catch (error) {
-//     return res.status(500).json({ 
-//         success: false, 
-//         message: error.message 
-//     });
-//   }
-// };
-
-/**
- * PATCH /wallets/:walletId/credit
- * Credit (add funds to) a wallet.
- * Body: { amount: Number }
- */
-// exports.creditWallet = async (req, res) => {
-//   try {
-//     const { amount } = req.body;
-//     const {walletId} = req.params;
-
-//     if (!amount || typeof amount !== "number" || amount <= 0) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: "amount must be a positive number." 
-//       });
-//     }
-
-//     const wallet = await Wallet.findById(walletId);
-
-//     if (!wallet) {
-//       return res.status(404).json({ 
-//         success: false, 
-//         message: "Wallet not found." 
-//       });
-//     }
-
-//     if (wallet.status !== "Active") {
-//       return res.status(403).json({
-//         success: false,
-//         message: `Cannot credit a wallet with status "${wallet.status}". Wallet must be Active.`,
-//       });
-//     }
-
-//     wallet.balance += amount;
-//     await wallet.save();
-
-//     return res.status(200).json({
-//       success: true,
-//       message: `₦${amount} credited successfully.`,
-//       data: wallet,
-//     });
-
-//   } catch (error) {
-
-//     return res.status(500).json({ 
-//         success: false,    
-//         message: error.message 
-//     });
-//   }
-// };
-
-/**
- * PATCH /wallets/:walletId/debit
- * Debit (withdraw funds from) a wallet.
- * Body: { amount: Number }
- */
-// exports.debitWallet = async (req, res) => {
-//   try {
-//     const { amount } = req.body;
-
-//     if (!amount || typeof amount !== "number" || amount <= 0) {
-//       return res.status(400).json({ success: false, message: "amount must be a positive number." });
-//     }
-
-//     const wallet = await Wallet.findById(req.params.walletId);
-
-//     if (!wallet) {
-//       return res.status(404).json({ success: false, message: "Wallet not found." });
-//     }
-
-//     if (wallet.status !== "Active") {
-//       return res.status(403).json({
-//         success: false,
-//         message: `Cannot debit a wallet with status "${wallet.status}". Wallet must be Active.`,
-//       });
-//     }
-
-//     if (wallet.balance < amount) {
-//       return res.status(422).json({ 
-//         success: false, 
-//         message: "Insufficient balance."
-//      });
-//     }
-
-//     wallet.balance -= amount;
-//     await wallet.save();
-
-//     return res.status(200).json({
-//       success: true,
-//       message: `₦${amount} debited successfully.`,
-//       data: wallet,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-/**
- * POST /wallets/transfer
- * Transfer funds between two wallets.
- * Body: { fromWalletId, toWalletId, amount }
- */
-// exports.transferFunds = async (req, res) => {
-//   try {
-//     const { fromWalletId, toWalletId, amount } = req.body;
-
-//     if (!fromWalletId || !toWalletId || !amount) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "fromWalletId, toWalletId, and amount are all required.",
-//       });
-//     }
-
-//     if (fromWalletId === toWalletId) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: "Cannot transfer to the same wallet." 
-//     });
-//     }
-
-//     if (typeof amount !== "number" || amount <= 0) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: "amount must be a positive number." 
-//     });
-//     }
-
-//     // Fetch both wallets in parallel for efficiency
-//     // This also allows us to check for their existence and status before 
-//     // attempting any updates.
-
-//     const [sender, receiver] = await Promise.all([
-//       Wallet.findById(fromWalletId),
-//       Wallet.findById(toWalletId),
-//     ]);
-
-//     if (!sender) return res.status(404).json({ 
-//         success: false, 
-//         message: "Sender wallet not found." });
-
-//     if (!receiver) return res.status(404).json({ 
-//         success: false, 
-//         message: "Receiver wallet not found." });
-
-//     if (sender.status !== "Active") {
-//       return res.status(403).json({
-//         success: false,
-//         message: `Sender wallet is "${sender.status}" and cannot initiate transfers.`,
-//       });
-//     }
-
-//     if (receiver.status !== "Active") {
-//       return res.status(403).json({
-//         success: false,
-//         message: `Receiver wallet is "${receiver.status}" and cannot receive funds.`,
-//       });
-//     }
-
-//     if (sender.currency !== receiver.currency) {
-//       return res.status(422).json({
-//         success: false,
-//         message: `Currency mismatch: ${sender.currency} → ${receiver.currency}. Cross-currency transfers are not supported.`,
-//       });
-//     }
-
-//     if (sender.balance < amount) {
-//       return res.status(422).json({ 
-//         success: false, 
-//         message: "Insufficient balance in sender wallet." });
-//     }
-
-//     sender.balance -= amount;
-//     receiver.balance += amount;
-
-//     await Promise.all([sender.save(), receiver.save()]);
-
-//     return res.status(200).json({
-//       success: true,
-//       message: `Transfer of ${sender.currency} ${amount} completed.`,
-//       data: { sender, receiver },
-//     });
-
-//   } catch (error) {
-//     return res.status(500).json({ 
-//         success: false, 
-//         message: error.message });
-//   }
-// };
-
-/**
- * POST /wallet/transfer
- * Initiate an interbank transfer from the user's wallet.
- *
- * Expected body:
- * {
- *   destinationAccountNumber: string,
- *   destinationBankCode: string,
- *   amount: number,        // in kobo (smallest unit)
- *   narration: string,
- * }
- */
-// exports.interbankTransfer = async (req, res) => {
-//   try {
-//     const userId = req.userId;
-//     const { destinationAccountNumber, destinationBankCode, amount, narration } = req.body;
- 
-//     // Input validation
-//     if (!destinationAccountNumber || !destinationBankCode || !amount) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "destinationAccountNumber, destinationBankCode, and amount are required",
-//       });
-//     }
- 
-//     if (typeof amount !== "number" || amount <= 0) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: "Amount must be a positive number" 
-//     });
-//     }
- 
-//     // Wallet checks 
-//     const wallet = await Wallet.findOne({ user: userId });
-//     if (!wallet) {
-//       return res.status(404).json({ 
-//         success: false, 
-//         message: "Wallet not found" 
-//     });
-//     }
- 
-//     if (wallet.status !== "Active") {
-//       return res.status(403).json({
-//         success: false,
-//         message: `Transfers are not allowed on a ${wallet.status.toLowerCase()} wallet`,
-//       });
-//     }
- 
-//     if (wallet.balance < amount) {
-//       return res.status(402).json({ 
-//         success: false, 
-//         message: "Insufficient wallet balance" 
-//       });
-//     }
- 
-//     // Debit wallet first (optimistic debit) 
-//     wallet.balance -= amount;
-//     await wallet.save();
- 
-//     //  Dispatch to NIBSS 
-//     let nibssResponse;
-
-//     try {
-//         // Note: If the NIBSS transfer fails, we should ideally have a mechanism to 
-//         // retry or compensate.
-//         nibssResponse = await interbankTransfer({
-//         sourceAccountNumber: wallet.accountNumber,
-//         destinationAccountNumber,
-//         destinationBankCode,
-//         amount,
-//         narration: narration || "Wallet transfer",
-//         currency: wallet.currency,
-//       });
-//     } catch (transferError) {
-//       // Rollback debit on NIBSS failure
-//       wallet.balance += amount;
-//       await wallet.save();
- 
-//       console.error("NIBSS transfer error:", transferError);
-//       return res.status(502).json({
-//         success: false,
-//         message: "Transfer failed. Your balance has been restored.",
-//         error: transferError.response?.data || transferError.message,
-//       });
-//     }
- 
-//     return res.status(200).json({
-//       success: true,
-//       message: "Transfer successful",
-//       data: {
-//         newBalance: wallet.balance,
-//         currency: wallet.currency,
-//         transfer: nibssResponse,
-//       },
-//     });
-
-//   } catch (error) {
-//     console.error("interbankTransfer error:", error);
-//     return res.status(500).json({ 
-//         success: false, 
-//         message: "Internal server error" 
-//     });
-//   }
-// };
-
-/**
- * DELETE /wallets/:walletId
- * Soft-delete by setting status to "Closed".
- * Hard deletion is intentionally avoided for audit purposes.
- */
-// exports.closeWallet = async (req, res) => {
-//   try {
-//     const { walletId } = req.params;
-
-//     const wallet = await Wallet.findById(walletId);
-
-//     if (!wallet) {
-//       return res.status(404).json({ 
-//         success: false, 
-//         message: "Wallet not found." 
-//     });
-//     }
-
-//     if (wallet.balance > 0) {
-//       return res.status(422).json({
-//         success: false,
-//         message: "Cannot close a wallet with a non-zero balance. Please withdraw or transfer funds first.",
-//       });
-//     }
-
-//     wallet.status = "Closed";
-//     await wallet.save();
-
-//     return res.status(200).json({ 
-//         success: true, 
-//         message: "Wallet closed successfully.", data: wallet 
-//     });
-
-//   } catch (error) {
-//     return res.status(500).json({ 
-//         success: false, 
-//         message: error.message 
-//     });
-//   }
-// };
-
-// module.exports = {
-//   createWallet,
-//   getWalletById,
-//   getWalletsByUser,
-//   updateWalletStatus,
-//   creditWallet,
-//   debitWallet,
-//   transferFunds,
-//   interbankTransfer
-//   closeWallet,
-//   verifyBVN,
-//   verifyNIN
-// };
+module.exports = { createWallet, verifyBVN, verifyNIN, enquireName, getWallet, getWalletById, updateWalletStatus }
