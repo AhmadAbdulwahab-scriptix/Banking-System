@@ -15,4 +15,11 @@ const genAccessToken = (user) => {
   );
 };
 
-module.exports = { genAccessToken }
+/**
+ * Generates a unique transaction reference.
+ * Format: TXN-<timestamp>-<4 random hex chars>
+ */
+const generateReference = () =>
+  `TXN-${Date.now()}-${Math.random().toString(16).slice(2, 6).toUpperCase()}`;
+
+module.exports = { genAccessToken, generateReference }

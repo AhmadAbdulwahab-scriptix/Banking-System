@@ -111,7 +111,9 @@ exports.verifyBVN = async (req, res) => {
       message: "BVN verified successfully. Wallet is now active.",
       data: { wallet, nibssData: nibssResponse },
     });
+    
   } catch (error) {
+
     console.error("verifyBVN error:", error);
  
     if (error.response?.status === 400) {

@@ -40,6 +40,7 @@ const transactionSchema = new Schema({
     },
 
     narration: {type: String},
+    
 }, {timestamps: true});
 
 module.exports = mongoose.model('Transaction', transactionSchema);
