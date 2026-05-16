@@ -28,9 +28,11 @@ const register = async (req, res) => {
         if (!firstName) missing.push('firstName');
         if (!lastName)  missing.push('lastName');
         if (!dob)       missing.push('dob');
+        if (!email)     missing.push('email');
         if (!phone)     missing.push('phone');
         if (!password)  missing.push('password');
         if (!kycType)   missing.push('kycType');
+        if (!bvn && !nin) missing.push('bvn and nin');
 
         if (missing.length) {
             return res.status(400).json({
@@ -79,7 +81,7 @@ const register = async (req, res) => {
 
         // ── Hash password
         // const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-         const securedPassword = await hashPassword(password);
+        const securedPassword = await hashPassword(password);
         if (!securedPassword) {
             return res.status(500).json({
                 success: false,
@@ -94,7 +96,7 @@ const register = async (req, res) => {
             dob,
             email:    email || undefined,
             phone,
-            // password: securedPassword,
+            password: securedPassword,
             kycType,
             nin:      nin || undefined,
             bvn:      bvn || undefined,
@@ -160,9 +162,6 @@ const login = async (req, res) => {
                 success: false, 
                 message: 'Email and Password do not match' });
         }
-
-       
-
         const token = genAccessToken(user);
 
         // Remove password from response
