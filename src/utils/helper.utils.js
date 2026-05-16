@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const Wallet = require('../models/Wallet.model')
 
 const generateTxRef = async (Transaction) => {
     let num;
