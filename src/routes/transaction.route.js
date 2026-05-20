@@ -2,13 +2,21 @@ const express = require('express');
 const router = express.Router();
 const { 
     intraBankTransferFunds,
-    interBankTransferFunds, 
-    transactionHistory } = require('../controllers/transactions.controller');
+    interBankTransferFunds,
+    transactionHistory,
+    depositFunds,
+    withdrawFunds,
+    getAllTransactions
+} = require('../controllers/transactions.controller');
 
-router.post("/interbank-transfer", interBankTransferFunds)
+router.post("/interbank-transfer", interBankTransferFunds);
+router.post("/intrabank-transfer", intraBankTransferFunds);
 
-router.post("/intrabank-transfer", intraBankTransferFunds)
+router.get("/all", getAllTransactions);
 
-router.get("/history/:reference", transactionHistory)
+router.get("/history/:reference", transactionHistory);
 
-module.exports = router
+router.post("/deposit", depositFunds);
+router.post("/withdraw", withdrawFunds);
+
+module.exports = router;

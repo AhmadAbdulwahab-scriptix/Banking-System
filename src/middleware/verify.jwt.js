@@ -20,7 +20,7 @@ const verifyJWT = (req, res, next) => {
             req.role = decoded.userInfo.role
             next();
   } catch (err) {
-    return res.status(401).json({ success: false, message: 'Invalid token. Please log in again.' })
+    return res.status(401).json({ success: false, message: 'Unauthorized action initiated' })
   };
 }
 

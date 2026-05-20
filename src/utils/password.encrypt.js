@@ -12,15 +12,24 @@ const hashPassword = async (password) => {
     }
 };
 
-// Function to compare a password with a hashed password
+const hashPin = async (pin) => {
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPin = await bcrypt.hash(pin, salt);
+        return hashedPin;
+    } catch (error) {
+        console.error("Error hashing pin:", error);
+        throw new Error("Hashing failed");
+    }
+};
+
 // Function to compare a password with a hashed password
 const comparePassword = async (password, userPassword) => {
     try {
-         if (!password || !userPassword) {
+        if (!password || !userPassword) {
             throw new Error("Missing password or hash for comparison");
         }
         // Compare the plain password with the hashed password
-        // bcrypt.compare returns a promise that resolves to true or false
         const isMatch = await bcrypt.compare(password, userPassword);
         return isMatch;
     } catch (error) {
@@ -29,10 +38,25 @@ const comparePassword = async (password, userPassword) => {
     }
 }
 
+// compare a transaction pin with a hashed one
+const comparePin = async (pin, userPin) => {
+    try {
+        if (!pin || !userPin) {
+            throw new Error("Missing pin or hash for comparison");
+        }
+        // Compare the plain password with the hashed password
+        const isMatch = await bcrypt.compare(pin, userPin);
+        return isMatch;
+    } catch (error) {
+        console.error("Error comparing pin:", error);
+        throw new Error("Comparison failed");
+    }
+}
+
 // Function to generate JWT token
 const generateToken = (userId) => {   
     try {
-         if (!process.env.ACCESS_TOKEN_SECRET) {
+        if (!process.env.ACCESS_TOKEN_SECRET) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
         const token = jwt.sign(          
@@ -81,7 +105,9 @@ const sanitizeUser = (user) => {
 
 module.exports = {
     hashPassword,
+    hashPin,
     comparePassword,
+    comparePin,
     generateToken,
     signToken,
     sanitizeUser
