@@ -319,13 +319,17 @@ const enquireName = async (req, res) => {
     // 1️⃣ EXTERNAL API - Name Enquiry
     let nibssResponse;
     try {
+
       nibssResponse = await nameEnquiry(accountNumber);
+
     } catch (enquiryErr) {
+      
       console.error('[nameEnquiry] NIBSS API failed:', enquiryErr.message);
       if (enquiryErr.response?.status === 404) {
         return res.status(404).json({ 
           success: false, 
-          message: "Account number not found" 
+          message: "Account number not found",
+          errorStack : enquiryErr.stack 
         });
       }
       throw enquiryErr;
@@ -473,4 +477,12 @@ const updateWalletStatus = async (req, res) => {
   }
 };
 
-module.exports = { createWallet, verifyBVN, verifyNIN, enquireName, getWallet, getWalletById, updateWalletStatus }
+module.exports = { 
+  createWallet, 
+  verifyBVN, 
+  verifyNIN, 
+  enquireName, 
+  getWallet, 
+  getWalletById, 
+  updateWalletStatus 
+};

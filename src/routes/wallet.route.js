@@ -8,13 +8,15 @@ router.post("/verify-bvn", Wallet.verifyBVN);
 
 router.post("/verify-nin", Wallet.verifyNIN);
 
-router.get("/name-enquiry/:accountNumber", Wallet.nameEnquiry);
+router.get("/name-enquiry/:accountNumber", Wallet.enquireName);
 
 router.get("/", Wallet.getWallet)
 
 router.get("/:walletId", Wallet.getWalletById)
 
-//router.post("/transfer", Wallet.interbankTransfer);
+// router.get("/name-enquiry/:accountNumber", Wallet.nameEnquiry);
+
+// router.post("/transfer", Wallet.interbankTransfer);
 
 // router.get("/:walletId", Wallet.getWalletById);
 

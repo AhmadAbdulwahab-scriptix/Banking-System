@@ -1,18 +1,26 @@
 const Transaction = require('../models/Transaction.model');
-const Wallet = require('../models/Wallet.model')
-const { interbankTransfer, transactionStatus, nameEnquiry } = require('../services/nibbs.services')
-const { generateTxRef, checkTransactionOwnership } = require('../utils/helper.utils')
+const Wallet = require('../models/Wallet.model');
+const { 
+  interbankTransfer, 
+  transactionStatus, 
+  nameEnquiry } = require('../services/nibbs.services');
+const { 
+  generateTxRef,
+  checkTransactionOwnership } = require('../utils/helper.utils');
 const mongoose = require('mongoose')
 
-exports.intraBankTransferFunds = async (req, res) => {
+const intraBankTransferFunds = async (req, res) => {
     try {
-        const { userId, role } = req;
+        const { userId, role } = req.userId;
         const { receiverWalletId, amount, narration } = req.body;
         if (!receiverWalletId || !amount) {
             return res.status(400).json({ success: false, message: `Missing required fields, enter all required information!` });
         }
         if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(receiverWalletId) || Number.isNaN(amount) || amount < 10) {
-            return res.status(400).json({ success: false, message: "sender wallet ID, receiver wallet ID and amount must be valid"})
+            return res.status(400).json({ 
+              success: false, 
+              message: "sender wallet ID, receiver wallet ID and amount must be valid"
+            });
         }
 
         const [sender, receiver] = await Promise.all([
@@ -22,10 +30,17 @@ exports.intraBankTransferFunds = async (req, res) => {
         
         // Null check before accessing properties
         if (!sender) {
-            return res.status(404).json({ success: false, message: `Sender wallet not found` });
+            return res.status(404).json({ 
+              success: false, 
+              message: `Sender wallet not found` 
+            });
         }
+
         if (!receiver) { 
-            return res.status(404).json({ success: false, message: "Receiver wallet not found." });
+            return res.status(404).json({ 
+              success: false, 
+              message: "Receiver wallet not found." 
+            });
         }
         if(sender._id.toString() === receiverWalletId) {
             return res.status(400).json({ success: false, message: "cannot transfer funds to the same account" })
@@ -57,7 +72,11 @@ exports.intraBankTransferFunds = async (req, res) => {
             sender.balance += amount;
             receiver.balance -= amount;
             console.error('[intraBankTransfer] Database save error:', saveErr);
-            return res.status(500).json({ success: false, message: 'Failed to process transfer. Please try again.' });
+
+            return res.status(500).json({ 
+              success: false, 
+              message: 'Failed to process transfer. Please try again.' 
+            });
         }
         
         // Create transaction record with error handling
@@ -73,13 +92,16 @@ exports.intraBankTransferFunds = async (req, res) => {
                 type: "transfer",
                 status: "success"
             });  
+
             return res.status(201).json({
                 success: true,
                 message: `Transfer of ${amount} carried out successfully`,
                 transactionDetails
             })
+
         } catch (txErr) {
             console.error('[intraBankTransfer] Transaction creation error:', txErr);
+
             return res.status(500).json({ 
                 success: false, 
                 message: 'Transfer completed but transaction record creation failed.',
@@ -88,12 +110,17 @@ exports.intraBankTransferFunds = async (req, res) => {
         }
     } catch (err) {
         console.error('[intraBankTransfer]', err.message || err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Internal server error',
+          error: err.message || err,
+          errorStack: err.stack 
+        });
     }
 }
 
 //interbank
-exports.interBankTransferFunds = async (req, res) => {
+const interBankTransferFunds = async (req, res) => {
     try {
         const { userId, role } = req;
         const { receiverAccountNumber, amount, narration } = req.body;
@@ -161,11 +188,15 @@ exports.interBankTransferFunds = async (req, res) => {
         }   
         try {
             nibssResponse = await interbankTransfer(payload);
+
         } catch (transferError) {
             // Rollback balance on transfer failure
             sender.balance += amount;
+
             try {
+
                 await sender.save();
+
             } catch (rollbackErr) {
                 console.error('[interBankTransfer] Rollback error:', rollbackErr);
             }
@@ -175,6 +206,7 @@ exports.interBankTransferFunds = async (req, res) => {
                 success: false,
                 message: "Transfer failed. Your balance has been restored.",
                 error: transferError.response?.data || transferError.message,
+                errorStack: transferError.stack
             });
         }   
 
@@ -208,7 +240,7 @@ exports.interBankTransferFunds = async (req, res) => {
     }
 }
 
-exports.transactionHistory = async (req, res) => {
+const transactionHistory = async (req, res) => {
     try {
         const reference = req.params.reference;
         if (!reference)  return res.status(400).json({ success: false, message: 'Transaction reference ID is required' });
@@ -325,8 +357,8 @@ exports.transactionHistory = async (req, res) => {
 };
 
 
-// module.exports = { 
-//   intraBankTransferFunds, 
-//   interBankTransferFunds, 
-//   transactionHistory,
-// };
+module.exports = { 
+  intraBankTransferFunds, 
+  interBankTransferFunds, 
+  transactionHistory,
+};

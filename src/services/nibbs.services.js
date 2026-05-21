@@ -74,7 +74,7 @@ const validateNIN = async (nin) => {
 };
 
 const nameEnquiry = async (account_number) => {
-    const response = await API.get(`/api/account/name-enquiry/${account_number}`);
+    const response = await API?.get(`/api/account/name-enquiry/${account_number}`);
     return response.data;
 };
 
