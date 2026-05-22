@@ -73,7 +73,7 @@ const registerCustomer = async (req, res) => {
             nin:  nin  || undefined,
             bvn:  bvn  || undefined,
             role: 'customer',
-            isVerified: false
+            isVerified: true
         });
 
         const { accessToken, refreshToken } = issueTokens(res, user);
@@ -461,4 +461,4 @@ const updateUserInfo = async (req, res) => {
     }
 };
 
-module.exports = { registerCustomer, login, refreshToken, logout, resetPassword, updateUserInfo };
+module.exports = { registerCustomer, registerStaff, registerAdmin, login, refreshToken, logout, resetPassword, updateUserInfo };

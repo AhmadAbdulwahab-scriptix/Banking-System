@@ -18,9 +18,9 @@ router.get("/:walletId", Wallet.getWalletById)
 
 router.patch("/status/:walletId", Wallet.updateWalletStatus);
 
-router.post("/approve-bvn", Wallet.approveBVN);
+router.post("/:walletId/approve-bvn", Wallet.approveBVN);
 
-router.post("/approve-nin", Wallet.approveNIN);
+router.post("/:walletId/approve-nin", Wallet.approveNIN);
 
 // router.get("/user/:userId", Wallet.getWalletsByUser);
 

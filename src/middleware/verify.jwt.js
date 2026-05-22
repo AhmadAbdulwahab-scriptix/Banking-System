@@ -20,7 +20,8 @@ const verifyJWT = (req, res, next) => {
             req.role = decoded.userInfo.role
             next();
   } catch (err) {
-    return res.status(401).json({ success: false, message: 'Unauthorized action initiated' })
+    console.log(err.message)
+    return res.status(401).json({ success: false, message: '[verifyJWT]:  Unauthorized action initiated' })
   };
 }
 

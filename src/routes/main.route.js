@@ -8,13 +8,13 @@ router.use('/auth', require('./auth.route'));
 
 router.use('/wallet',
     verifyJWT,
-    verifyRoles('customer', 'staff', 'admin'),
+    verifyRoles('customer', 'staff', 'admin', 'super-admin'),
     require('./wallet.route')
 );
 
 router.use('/transaction',
     verifyJWT,
-    verifyRoles('customer', 'staff', 'admin'),
+    verifyRoles('customer', 'staff', 'admin', 'super-admin'),
     require('./transaction.route')
 );
 

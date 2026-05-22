@@ -17,7 +17,7 @@ const userSchema = new Schema({
 
     dob: {
         type: Date,
-        required: true
+        // required: true
     },
 
     email: {
@@ -63,7 +63,6 @@ const userSchema = new Schema({
 
     kycType: {
         type: String,
-        required: true,
         enum: ['NIN', 'BVN']
     },
 

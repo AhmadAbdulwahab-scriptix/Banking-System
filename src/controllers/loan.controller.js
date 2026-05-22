@@ -23,6 +23,9 @@ const applyLoan = async (req, res) => {
         if (!amount || !durationMonths) {
             return res.status(400).json({ success: false, message: 'amount and durationMonths are required' });
         }
+        if (Number.isNaN(amount)) {
+            return res.status(400).json({ success: false, message: 'amount must be a number' })
+        }
         if (amount < 1000) {
             return res.status(400).json({ success: false, message: 'Minimum loan amount is ₦1,000' });
         }

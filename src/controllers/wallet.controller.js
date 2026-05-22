@@ -7,7 +7,7 @@ const {
 
 const Wallet  = require("../models/Wallet.model"); 
 const User = require('../models/User.model')
-const mogoose = require('mongoose')
+const mongoose = require('mongoose')
 
 /**
  * POST /wallets
@@ -571,8 +571,7 @@ const getAllWallets = async (req, res) => {
     try {
       [wallets, total] = await Promise.all([
         Wallet.find(filter)
-          .populate('user', 'firstName lastName email phone role kycType isVerified')
-          .sort({ createdAt: -1 })
+          .populate('user', 'firstName lastName email phone role').sort({ createdAt: -1 })
           .skip(skip)
           .limit(Number(limit)),
         Wallet.countDocuments(filter)
@@ -632,7 +631,7 @@ const approveBVN = async (req, res) => {
     if (wallet?.user?.kycType !== 'BVN') {
       return res.status(400).json({
         success: false,
-        message: `User's KYC type is "${user.kycType}", not BVN`
+        message: `User's KYC type is "${wallet?.user?.kycType}", not BVN`
       });
     }
     if (wallet.status === 'Active') {
@@ -645,12 +644,10 @@ const approveBVN = async (req, res) => {
       });
     }
 
-    // Mark user as verified and activate wallet
-    user.isVerified = true;
     wallet.status = 'Active';
 
     try {
-      await Promise.all([user.save(), wallet.save()]);
+      await wallet.save();
     } catch (saveErr) {
       console.error('[approveBVN] Save failed:', saveErr.message);
       throw saveErr;
@@ -658,8 +655,8 @@ const approveBVN = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `BVN approved for ${user.firstName} ${user.lastName}. Wallet is now active.`,
-      data: { wallet, userId: user._id }
+      message: `BVN approved for ${wallet?.user?.firstName} ${wallet?.user?.lastName}. Wallet is now active.`,
+      data: { wallet, userId: wallet?.user?._id }
     });
 
   } catch (error) {
@@ -701,7 +698,7 @@ const approveNIN = async (req, res) => {
     if (wallet?.user?.kycType !== 'NIN') {
       return res.status(400).json({
         success: false,
-        message: `User's KYC type is "${user.kycType}", not NIN`
+        message: `User's KYC type is "${wallet?.user?.kycType}", not NIN`
       });
     }
     if (wallet.status === 'Active') {
@@ -715,11 +712,10 @@ const approveNIN = async (req, res) => {
     }
 
     // Mark user as verified and activate wallet
-    user.isVerified = true;
     wallet.status = 'Active';
 
     try {
-      await Promise.all([user.save(), wallet.save()]);
+      await wallet.save();
     } catch (saveErr) {
       console.error('[approveNIN] Save failed:', saveErr.message);
       throw saveErr;
@@ -727,8 +723,8 @@ const approveNIN = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `NIN approved for ${user.firstName} ${user.lastName}. Wallet is now active.`,
-      data: { wallet, userId: user._id }
+      message: `NIN approved for ${wallet?.user?.firstName} ${wallet?.user?.lastName}. Wallet is now active.`,
+      data: { wallet, userId: wallet?.user?._id }
     });
 
   } catch (error) {
