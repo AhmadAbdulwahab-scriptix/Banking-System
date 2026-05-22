@@ -528,9 +528,3 @@ exports.getAllTransactions = async (req, res) => {
 };
 
 
-
-module.exports = { 
-  intraBankTransferFunds, 
-  interBankTransferFunds, 
-  transactionHistory,
-};
