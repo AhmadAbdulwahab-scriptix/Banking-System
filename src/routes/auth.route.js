@@ -6,6 +6,7 @@ const { verifyJWT } = require("../middleware/verify.jwt");
 
 // ── Public routes (no token required) ──────────────────────────────────────
 router.post("/register", registerCustomer);
+
 router.post("/login", login);
 
 // /refresh

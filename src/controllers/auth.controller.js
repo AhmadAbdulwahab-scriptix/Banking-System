@@ -7,12 +7,6 @@ const jwt = require('jsonwebtoken');
 // ─── POST /api/auth/register-customer ────────────────────────────────────────────────
 const registerCustomer = async (req, res) => {
     try {
-        if (req.role !== "customer") {
-            return res.status(403).json({
-                success: false,
-                message: 'Only staff or admin can get wallet by ID'
-            });
-        }
         const { firstName, lastName, dob, email, phone, password, kycType, nin, bvn } = req.body;
 
         // Basic field validation — unchanged from original

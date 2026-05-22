@@ -20,7 +20,6 @@ const { errorHandler, notFound } = require('./middleware/errorHandler.middleware
 //REDIS CLIENT 
 // const redisClient = new Redis(process.env.REDIS_URL );
 
-
 const app = express();
 app.use(cors());
 app.use(express.json());
