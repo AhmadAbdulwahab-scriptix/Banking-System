@@ -58,7 +58,7 @@ const userSchema = new Schema({
 
     role: {
         type: String,
-        enum: ['customer', 'staff', 'admin'],
+        enum: ['customer', 'staff', 'admin', 'super-admin'],
     },
 
     kycType: {
@@ -69,8 +69,19 @@ const userSchema = new Schema({
 
     isVerified: {
         type: Boolean,
+        default: true
+    }, 
+
+    refreshToken: {
+        type: String,
+        default: null
+    },
+
+    txPin: {
+        type: String,
+        select: false
     }
 
-},{timeseries: true });
+},{ timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

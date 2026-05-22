@@ -7,6 +7,7 @@ const {
 
 const Wallet  = require("../models/Wallet.model"); 
 const User = require('../models/User.model')
+const mogoose = require('mongoose')
 
 /**
  * POST /wallets
@@ -15,16 +16,19 @@ const User = require('../models/User.model')
  */
 const createWallet = async (req, res) => {
   try {
-    const { userId, currency } = req.body;
-
+    const { userId, role } = req
+    if (role !== 'customer') {
+      return res.status(403).json({ success: false, message: "Only a customer is allowed to create a wallet" })
+    }
     if (!userId) {
-      return res.status(400).json({ 
+      return res.status(401).json({ 
         success: false, 
-        message: "userId is required." 
+        message: "Unauthorized to create wallet." 
       });
     }
 
-    // 1️⃣ Check for existing wallet
+    const { currency } = req.body;
+    // Check for existing wallet
     let existingWallet;
     try {
       existingWallet = await Wallet.findOne({ 
@@ -35,7 +39,7 @@ const createWallet = async (req, res) => {
       console.error('[Wallet.findOne] Wallet check failed:', walletCheckErr.message);
       throw walletCheckErr;
     }
-
+    
     if (existingWallet) {
       return res.status(409).json({
         success: false,
@@ -43,7 +47,7 @@ const createWallet = async (req, res) => {
       });
     }
     
-    // 2️⃣ Fetch user details
+    // Fetch user details
     let user;
     try {
       user = await User.findById(userId);
@@ -58,8 +62,8 @@ const createWallet = async (req, res) => {
         message: "User not found"
       });
     }
-
-    // 3️⃣ EXTERNAL API - Create Account
+    
+    // EXTERNAL API - Create Account
     const payload = {
       kycType: user?.kycType?.toLowerCase(),
       kycID: user?.bvn || user?.nin,
@@ -86,7 +90,7 @@ const createWallet = async (req, res) => {
       throw createAccountErr;
     }
 
-    // 4️⃣ DATABASE - Create Wallet Record
+    // DATABASE - Create Wallet Record
     const wallet = new Wallet({
       user: userId,
       accountNumber,
@@ -123,9 +127,18 @@ const createWallet = async (req, res) => {
  */
 const verifyBVN = async (req, res) => {
   try {
-    const { bvn } = req.body;
-    const userId = req.userId;
+    const { userId, role } = req;
+    if (role !== 'customer') {
+      return res.status(403).json({ success: false, message: "Only a customer is allowed to create a wallet" })
+    }
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Unauthorized to create wallet." 
+      });
+    }
 
+    const { bvn } = req.body;
     if (!bvn) {
       return res.status(400).json({ 
         success: false, 
@@ -133,10 +146,10 @@ const verifyBVN = async (req, res) => {
     });
     }
 
-    // 1️⃣ Fetch wallet
+    // Fetch wallet
     let wallet;
     try {
-      wallet = await Wallet.findOne({ user: userId });
+      wallet = await Wallet.findOne({ user: userId }).populate("user", "kycType");
     } catch (walletErr) {
       console.error('[Wallet.findOne] Wallet fetch failed:', walletErr.message);
       throw walletErr;
@@ -148,6 +161,12 @@ const verifyBVN = async (req, res) => {
         message: "Wallet not found" 
       });
     }
+    if(wallet?.user?.kycType !== "BVN") {
+      return res.status(400).json({
+        success: false,
+        message: "Wallet wasn't created with BVN"
+      })
+    }
 
     if (["Suspended", "Frozen", "Closed"].includes(wallet.status)) {
       return res.status(403).json({
@@ -156,7 +175,7 @@ const verifyBVN = async (req, res) => {
       });
     }
 
-    // 2️⃣ EXTERNAL API - Verify BVN
+    // EXTERNAL API - Verify BVN
     let nibssResponse;
     try {
       nibssResponse = await validateBVN(bvn);
@@ -177,7 +196,7 @@ const verifyBVN = async (req, res) => {
       throw validateErr;
     }
 
-    // 3️⃣ DATABASE - Update Wallet Status
+    // DATABASE - Update Wallet Status
     wallet.status = "Active";
     try {
       await wallet.save();
@@ -194,7 +213,7 @@ const verifyBVN = async (req, res) => {
     
   } catch (error) {
     console.error("verifyBVN error:", error);
- 
+
     if (error.response?.status === 400) {
       return res.status(400).json({ 
         success: false, 
@@ -224,9 +243,18 @@ const verifyBVN = async (req, res) => {
  */
 const verifyNIN = async (req, res) => {
   try {
-    const { nin } = req.body;
-    const { userId } = req;
+    const { userId, role } = req;
+    if (role !== 'customer') {
+      return res.status(403).json({ success: false, message: "Only a customer is allowed to create a wallet" })
+    }
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Unauthorized to create wallet." 
+      });
+    }
 
+    const { nin } = req.body;
     if (!nin) {
       return res.status(400).json({ 
         success: false, 
@@ -234,20 +262,27 @@ const verifyNIN = async (req, res) => {
       });
     }
 
-    // 1️⃣ Fetch wallet
+    // Fetch wallet
     let wallet;
     try {
-      wallet = await Wallet.findOne({ user: userId });
+      wallet = await Wallet.findOne({ user: userId }).populate("user", "kycType");
     } catch (walletErr) {
       console.error('[Wallet.findOne] Wallet fetch failed:', walletErr.message);
       throw walletErr;
     }
-
+    console.log(wallet.user.nin);
+    
     if (!wallet) {
       return res.status(404).json({ 
         success: false, 
         message: "Wallet not found" 
       });
+    }
+    if(wallet.user.kycType !== "NIN") {
+      return res.status(400).json({
+        success: false,
+        message: "Wallet wasn't created with NIN"
+      })
     }
 
     if (["Suspended", "Frozen", "Closed"].includes(wallet.status)) {
@@ -257,7 +292,7 @@ const verifyNIN = async (req, res) => {
       });
     }
 
-    // 2️⃣ EXTERNAL API - Verify NIN
+    // EXTERNAL API - Verify NIN
     let nibssResponse;
     try {
       nibssResponse = await validateNIN(nin);
@@ -278,7 +313,7 @@ const verifyNIN = async (req, res) => {
       throw validateErr;
     }
     
-    // 3️⃣ DATABASE - Update Wallet Status
+    // DATABASE - Update Wallet Status
     wallet.status = "Active";
     try {
       await wallet.save();
@@ -316,7 +351,7 @@ const enquireName = async (req, res) => {
     });
     }
 
-    // 1️⃣ EXTERNAL API - Name Enquiry
+    // EXTERNAL API - Name Enquiry
     let nibssResponse;
     try {
 
@@ -356,10 +391,20 @@ const enquireName = async (req, res) => {
  */
 const getWallet = async (req, res) => {
   try {
-    // 1️⃣ DATABASE - Fetch wallet with user details
+    const { role, userId } = req;
+    if (role !== 'customer') {
+      return res.status(403).json({ success: false, message: "Only a customer is allowed to get wallet details" })
+    };
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Unauthorized to get wallet details." 
+      });
+    };
+
     let wallet;
     try {
-      wallet = await Wallet.findOne({ user: req.userId }).populate("user", "name email");
+      wallet = await Wallet.findOne({ user: userId }).populate("user", "name email");
     } catch (walletErr) {
       console.error('[Wallet.findOne] Wallet fetch failed:', walletErr.message);
       throw walletErr;
@@ -392,9 +437,18 @@ const getWallet = async (req, res) => {
  */
 const getWalletById = async (req, res) => {
   try {
+    // Role guard — customers must not be able to get other users info
+    if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only staff or admin can get wallet by ID'
+      });
+    }
     const { walletId } = req.params;
-    
-    // 1️⃣ DATABASE - Fetch wallet by ID
+    if (!walletId || !mongoose.Types.ObjectId.isValid(walletId)) {
+      return res.status(400).json({ success: false, message: 'Valid wallet ID is required' });
+    }
+    // DATABASE - Fetch wallet by ID
     let wallet;
     try {
       wallet = await Wallet.findById(walletId).populate("user", "name email");
@@ -432,22 +486,38 @@ const getWalletById = async (req, res) => {
  */
 const updateWalletStatus = async (req, res) => {
   try {
-    const { userId, status } = req.body;
+    // Role guard — customers must not be able to change their own wallet status
+    if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only staff or admin can update wallet status'
+      });
+    }
 
+    const { walletId } = req.params;
+    const { status } = req.body
     const allowed = ["Active", "Suspended", "Frozen", "Closed", "Dormant"];
 
-    if (!status || !allowed.includes(status)) {
+    if (!walletId || !mongoose.Types.ObjectId.isValid(walletId)) {
+      return res.status(400).json({ success: false, message: 'Valid wallet ID is required' });
+    }
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "Status is required",
+      });
+    }
+    if (!allowed.includes(status)) {
       return res.status(400).json({
         success: false,
         message: `Status must be one of: ${allowed.join(", ")}`,
       });
     }
 
-    // 1️⃣ DATABASE - Update Wallet Status
     let wallet;
     try {
-      wallet = await Wallet.findOneAndUpdate(
-        { user: userId },
+      wallet = await Wallet.findByIdAndUpdate(
+        walletId,
         { status },
         { new: true }
       );
@@ -457,10 +527,7 @@ const updateWalletStatus = async (req, res) => {
     }
 
     if (!wallet) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Wallet not found" 
-      });
+      return res.status(404).json({ success: false, message: "Wallet not found" });
     }
 
     return res.status(200).json({
@@ -470,19 +537,219 @@ const updateWalletStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("[updateWalletStatus] Unexpected error:", error.message || error);
-    return res.status(500).json({ 
-        success: false, 
-        message: "Internal server error" 
-    });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-module.exports = { 
-  createWallet, 
-  verifyBVN, 
-  verifyNIN, 
-  enquireName, 
-  getWallet, 
-  getWalletById, 
-  updateWalletStatus 
+/**
+ * GET /wallet/all
+ * Staff/Admin only: get all wallets with optional filters and pagination.
+ * Query: ?status=Active|Suspended|Frozen|Closed|Dormant&page=1&limit=20
+ */
+const getAllWallets = async (req, res) => {
+  try {
+    if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only staff or admin can view all wallets'
+      });
+    }
+
+    const { status, page = 1, limit = 20 } = req.query;
+
+    const filter = {};
+    const allowed = ["Active", "Suspended", "Frozen", "Closed", "Dormant", "Pending"];
+    if (status) {
+      if (!allowed.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status filter. Must be one of: ${allowed.join(', ')}`
+        });
+      }
+      filter.status = status;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    let wallets, total;
+    try {
+      [wallets, total] = await Promise.all([
+        Wallet.find(filter)
+          .populate('user', 'firstName lastName email phone role kycType isVerified')
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(Number(limit)),
+        Wallet.countDocuments(filter)
+      ]);
+    } catch (dbErr) {
+      console.error('[getAllWallets] DB query failed:', dbErr.message);
+      throw dbErr;
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: wallets,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
+
+  } catch (error) {
+    console.error('[getAllWallets] Unexpected error:', error.message || error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 };
+
+/**
+ * PATCH /wallet/approve-bvn
+ * Staff/Admin only: manually approve a user's BVN and activate their wallet.
+ * Used when automated NIBSS verification is not available or needs override.
+ * Body: { userId: string }
+ */
+const approveBVN = async (req, res) => {
+  try {
+    if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only staff or admin can approve BVN'
+      });
+    }
+    const { walletId } = req.params;
+
+    if (!walletId || !mongoose.Types.ObjectId.isValid(walletId)) {
+      return res.status(400).json({ success: false, message: 'Valid wallet ID is required' });
+    }
+    // Fetch the user to confirm they have a BVN on record
+    let wallet;
+    try {
+      wallet = await Wallet.findById(walletId).populate("user", "kycType");
+    } catch (walletErr) {
+      console.error('[approveBVN] Wallet fetch failed:', walletErr.message);
+      throw walletErr;
+    }
+    if (!wallet) {
+      return res.status(404).json({ success: false, message: 'Wallet not found for this user' });
+    }
+    if (wallet?.user?.kycType !== 'BVN') {
+      return res.status(400).json({
+        success: false,
+        message: `User's KYC type is "${user.kycType}", not BVN`
+      });
+    }
+    if (wallet.status === 'Active') {
+      return res.status(409).json({ success: false, message: 'Wallet is already active' });
+    }
+    if (['Closed', 'Frozen'].includes(wallet.status)) {
+      return res.status(403).json({
+        success: false,
+        message: `Cannot approve BVN for a ${wallet.status.toLowerCase()} wallet`
+      });
+    }
+
+    // Mark user as verified and activate wallet
+    user.isVerified = true;
+    wallet.status = 'Active';
+
+    try {
+      await Promise.all([user.save(), wallet.save()]);
+    } catch (saveErr) {
+      console.error('[approveBVN] Save failed:', saveErr.message);
+      throw saveErr;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `BVN approved for ${user.firstName} ${user.lastName}. Wallet is now active.`,
+      data: { wallet, userId: user._id }
+    });
+
+  } catch (error) {
+    console.error('[approveBVN] Unexpected error:', error.message || error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * PATCH /wallet/approve-nin
+ * Staff/Admin only: manually approve a user's NIN and activate their wallet.
+ * Body: { userId: string }
+ */
+const approveNIN = async (req, res) => {
+  try {
+    if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only staff or admin can approve NIN'
+      });
+    }
+
+    const { walletId } = req.params;
+
+    if (!walletId || !mongoose.Types.ObjectId.isValid(walletId)) {
+      return res.status(400).json({ success: false, message: 'Valid wallet ID is required' });
+    }
+    // Fetch the user to confirm they have a BVN on record
+    let wallet;
+    try {
+      wallet = await Wallet.findById(walletId).populate("user", "kycType");
+    } catch (walletErr) {
+      console.error('[approveNIN] Wallet fetch failed:', walletErr.message);
+      throw walletErr;
+    }
+    if (!wallet) {
+      return res.status(404).json({ success: false, message: 'Wallet not found for this user' });
+    }
+    if (wallet?.user?.kycType !== 'NIN') {
+      return res.status(400).json({
+        success: false,
+        message: `User's KYC type is "${user.kycType}", not NIN`
+      });
+    }
+    if (wallet.status === 'Active') {
+      return res.status(409).json({ success: false, message: 'Wallet is already active' });
+    }
+    if (['Closed', 'Frozen'].includes(wallet.status)) {
+      return res.status(403).json({
+        success: false,
+        message: `Cannot approve BVN for a ${wallet.status.toLowerCase()} wallet`
+      });
+    }
+
+    // Mark user as verified and activate wallet
+    user.isVerified = true;
+    wallet.status = 'Active';
+
+    try {
+      await Promise.all([user.save(), wallet.save()]);
+    } catch (saveErr) {
+      console.error('[approveNIN] Save failed:', saveErr.message);
+      throw saveErr;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `NIN approved for ${user.firstName} ${user.lastName}. Wallet is now active.`,
+      data: { wallet, userId: user._id }
+    });
+
+  } catch (error) {
+    console.error('[approveNIN] Unexpected error:', error.message || error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+module.exports = {
+  createWallet,
+  verifyBVN,
+  verifyNIN,
+  enquireName,
+  getWallet,
+  getWalletById,
+  updateWalletStatus,
+  getAllWallets,
+  approveBVN,
+  approveNIN
+}

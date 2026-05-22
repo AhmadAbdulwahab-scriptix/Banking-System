@@ -30,7 +30,6 @@ const getNibssToken = async () => {
 const API = axios.create({
     baseURL: process.env.NIBSS_BASE_URL,
     headers: {
-        // "x-api-key": process.env.NIBSS_API_KEY,
         "Content-Type": "application/json",
     },
     withCredentials: true,

@@ -6,9 +6,7 @@ const generateTxRef = async (Transaction) => {
     while (exists) {
         num = crypto.randomInt(1000000000000, 9999999999999);
         exists = await Transaction.exists({ reference: `TX${num}` });
-    }
-    
-    
+    }  
     return `TX${num}`;
 };
 
@@ -30,4 +28,11 @@ const checkTransactionOwnership = async (Wallet, liveTx, userId) => {
     };
 };
 
-module.exports = { generateTxRef, checkTransactionOwnership }
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    // secure: process.env.NODE_ENV === 'production',
+    // sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in ms, matches REFRESH_TOKEN_EXPIRES_IN
+};
+
+module.exports = { generateTxRef, checkTransactionOwnership, COOKIE_OPTIONS }

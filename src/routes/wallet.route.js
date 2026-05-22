@@ -12,24 +12,14 @@ router.get("/name-enquiry/:accountNumber", Wallet.enquireName);
 
 router.get("/", Wallet.getWallet)
 
+router.get("/all", Wallet.getAllWallets);
+
 router.get("/:walletId", Wallet.getWalletById)
 
-// router.get("/name-enquiry/:accountNumber", Wallet.nameEnquiry);
+router.patch("/status/:walletId", Wallet.updateWalletStatus);
 
-// router.post("/transfer", Wallet.interbankTransfer);
+router.post("/approve-bvn", Wallet.approveBVN);
 
-// router.get("/:walletId", Wallet.getWalletById);
-
-// router.get("/user/:userId", Wallet.getWalletsByUser);
-
-// router.patch("/:walletId/status", Wallet.updateWalletStatus);
-
-// router.patch("/:walletId/credit", Wallet.creditWallet);
-
-// router.patch("/:walletId/debit", Wallet.debitWallet);
-
-// router.post("/transfer", Wallet.transferFunds);git switch branch-name
-
-// router.delete("/:walletId", Wallet.closeWallet);
+router.post("/approve-nin", Wallet.approveNIN);
 
 module.exports = router;

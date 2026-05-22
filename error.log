@@ -1,0 +1,73 @@
+{"level":"error","message":"404 - Route /api/auth/reset-passwor Not Found - /api/auth/reset-passwor - POST - ::1","service":"src","timestamp":"2026-05-19T17:30:52.316Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/auth/reset-password - POST - ::1","service":"src","timestamp":"2026-05-19T17:30:58.473Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:16:00.153Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:20:20.710Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:20:23.654Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:20:47.897Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:21:23.538Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:21:26.667Z"}
+{"level":"error","message":"404 - Route /api/auth/update-inf Not Found - /api/auth/update-inf - POST - ::1","service":"src","timestamp":"2026-05-19T23:21:42.391Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - POST - ::1","service":"src","timestamp":"2026-05-19T23:21:44.921Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/auth/update-info - PATCH - ::1","service":"src","timestamp":"2026-05-19T23:22:14.285Z"}
+{"level":"error","message":"404 - Route /api/auth/update-inf Not Found - /api/auth/update-inf - PATCH - ::1","service":"src","timestamp":"2026-05-19T23:27:10.150Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - PATCH - ::1","service":"src","timestamp":"2026-05-19T23:33:07.845Z"}
+{"level":"error","message":"404 - Route /api/auth/update-info Not Found - /api/auth/update-info - PUT - ::1","service":"src","timestamp":"2026-05-19T23:39:04.404Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/auth/logout - POST - ::1","service":"src","timestamp":"2026-05-19T23:47:19.490Z"}
+{"level":"error","message":"400 - Bad control character in string literal in JSON at position 25 (line 2 column 23) - /api/wallet/verify-nin - POST - ::1","service":"src","timestamp":"2026-05-20T00:39:06.191Z"}
+{"body":"{\r\n    \"nin\": \"0907711113\r\n}","expose":true,"level":"error","message":"Bad control character in string literal in JSON at position 25 (line 2 column 23)","service":"src","status":400,"statusCode":400,"timestamp":"2026-05-20T00:39:06.192Z","type":"entity.parse.failed"}
+{"level":"error","message":"404 - Route /api/wallet//name-enquiry/7935110761 Not Found - /api/wallet//name-enquiry/7935110761 - POST - ::1","service":"src","timestamp":"2026-05-20T00:45:27.276Z"}
+{"level":"error","message":"404 - Route /api/wallet//name-enquiry/7935110761 Not Found - /api/wallet//name-enquiry/7935110761 - GET - ::1","service":"src","timestamp":"2026-05-20T00:45:34.134Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/wallet/6a0d0090f9f91dba1d2bae62 - GET - ::1","service":"src","timestamp":"2026-05-20T01:13:12.943Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/wallet/6a0d0090f9f91dba1d2bae62 - GET - ::1","service":"src","timestamp":"2026-05-20T01:13:25.758Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/wallet/status/6a0d0090f9f91dba1d2bae62 - GET - ::1","service":"src","timestamp":"2026-05-20T01:15:23.341Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/wallet/status/6a0d0090f9f91dba1d2bae62 - PATCH - ::1","service":"src","timestamp":"2026-05-20T01:15:37.996Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/wallet/status/6a0d0090f9f91dba1d2bae62 - PATCH - ::1","service":"src","timestamp":"2026-05-20T01:15:55.776Z"}
+{"level":"error","message":"404 - Route /api/auth/set-tx-pin Not Found - /api/auth/set-tx-pin - GET - ::1","service":"src","timestamp":"2026-05-20T02:37:34.680Z"}
+{"level":"error","message":"404 - Route /api/auth/chage-tx-pin Not Found - /api/auth/chage-tx-pin - GET - ::1","service":"src","timestamp":"2026-05-20T02:40:55.444Z"}
+{"level":"error","message":"404 - Route /api/auth/chage-tx-pin Not Found - /api/auth/chage-tx-pin - POST - ::1","service":"src","timestamp":"2026-05-20T02:41:02.561Z"}
+{"level":"error","message":"404 - Route /api/auth/change-tx-pin Not Found - /api/auth/change-tx-pin - POST - ::1","service":"src","timestamp":"2026-05-20T02:41:20.062Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:21:16.296Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:21:16.297Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:21:26.234Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:21:26.235Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:22:50.005Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:22:50.006Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:23:23.405Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:23:23.406Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:26:35.490Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:26:35.491Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:27:58.679Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:27:58.680Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:31:05.686Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:31:05.686Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:32:00.291Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:32:00.291Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:39:45.755Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:39:45.767Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:39:52.539Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:39:52.540Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:41:59.725Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:41:59.726Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:44:41.274Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:44:41.275Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:45:22.435Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:45:22.436Z"}
+{"level":"error","message":"500 - Cannot set headers after they are sent to the client - /api/transaction/intrabank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T03:45:55.055Z"}
+{"code":"ERR_HTTP_HEADERS_SENT","level":"error","message":"Cannot set headers after they are sent to the client","service":"src","status":"error","statusCode":500,"timestamp":"2026-05-20T03:45:55.059Z"}
+{"level":"error","message":"400 - Unexpected token '}', ...\"txPin\": \r\n}\" is not valid JSON - /api/transaction/interbank-transfer - POST - ::1","service":"src","timestamp":"2026-05-20T04:31:33.944Z"}
+{"body":"{\r\n  \"receiverAccountNumber\": \"2713162402\",\r\n  \"amount\": 100,\r\n  \"txPin\": \r\n}","expose":true,"level":"error","message":"Unexpected token '}', ...\"txPin\": \r\n}\" is not valid JSON","service":"src","status":400,"statusCode":400,"timestamp":"2026-05-20T04:31:33.945Z","type":"entity.parse.failed"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/appliy - GET - ::1","service":"src","timestamp":"2026-05-20T05:11:16.614Z"}
+{"level":"error","message":"404 - Route /api/loan/appliy Not Found - /api/loan/appliy - GET - ::1","service":"src","timestamp":"2026-05-20T05:11:23.600Z"}
+{"level":"error","message":"404 - Route /api/loan/apply Not Found - /api/loan/apply - GET - ::1","service":"src","timestamp":"2026-05-20T05:11:26.209Z"}
+{"level":"error","message":"404 - Route /api//:loanId/reject Not Found - /api//:loanId/reject - POST - ::1","service":"src","timestamp":"2026-05-20T05:12:23.298Z"}
+{"level":"error","message":"404 - Route /api/:loanId/reject Not Found - /api/:loanId/reject - POST - ::1","service":"src","timestamp":"2026-05-20T05:12:32.097Z"}
+{"level":"error","message":"404 - Route /api/:loanId/reject Not Found - /api/:loanId/reject - POST - ::1","service":"src","timestamp":"2026-05-20T05:13:05.285Z"}
+{"level":"error","message":"404 - Route /api/9e9e/reject Not Found - /api/9e9e/reject - POST - ::1","service":"src","timestamp":"2026-05-20T05:13:18.783Z"}
+{"level":"error","message":"404 - Route /api/:loanId/reject Not Found - /api/:loanId/reject - POST - ::1","service":"src","timestamp":"2026-05-20T05:13:43.293Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/:loanId/appro - GET - ::1","service":"src","timestamp":"2026-05-20T05:15:36.572Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/:loanId/approve - GET - ::1","service":"src","timestamp":"2026-05-20T05:15:44.957Z"}
+{"level":"error","message":"404 - Route /api/loan/:loanId/approve Not Found - /api/loan/:loanId/approve - GET - ::1","service":"src","timestamp":"2026-05-20T05:15:53.406Z"}
+{"level":"error","message":"404 - Route /api/loan//:loanId/approve Not Found - /api/loan//:loanId/approve - GET - ::1","service":"src","timestamp":"2026-05-20T05:16:15.203Z"}
+{"level":"error","message":"404 - Route /api/loan/:loanId/approve Not Found - /api/loan/:loanId/approve - GET - ::1","service":"src","timestamp":"2026-05-20T05:16:21.195Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/all - GET - ::1","service":"src","timestamp":"2026-05-20T05:22:19.043Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/all - GET - ::1","service":"src","timestamp":"2026-05-20T05:22:54.357Z"}

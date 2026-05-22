@@ -1,34 +1,39 @@
 const Transaction = require('../models/Transaction.model');
-const Wallet = require('../models/Wallet.model');
-const { 
-  interbankTransfer, 
-  transactionStatus, 
-  nameEnquiry } = require('../services/nibbs.services');
-const { 
-  generateTxRef,
-  checkTransactionOwnership } = require('../utils/helper.utils');
+const Wallet = require('../models/Wallet.model')
+const { interbankTransfer, transactionStatus, nameEnquiry } = require('../services/nibbs.services')
+const { generateTxRef, checkTransactionOwnership } = require('../utils/helper.utils')
+const { verifyTxPin } = require('./txPin.controller')
 const mongoose = require('mongoose')
 
-const intraBankTransferFunds = async (req, res) => {
+// ─── intraBankTransferFunds ──────────────────────────────────────
+
+exports.intraBankTransferFunds = async (req, res) => {
     try {
-        const { userId, role } = req.userId;
-        const { receiverWalletId, amount, narration } = req.body;
-        if (!receiverWalletId || !amount) {
-            return res.status(400).json({ success: false, message: `Missing required fields, enter all required information!` });
+        const { userId, role } = req;
+        
+        if (role !== 'customer') {
+            return res.status(403).json({ success: false, message: "Only a customer is allowed to make transfer" })
         }
-        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(receiverWalletId) || Number.isNaN(amount) || amount < 10) {
-            return res.status(400).json({ 
-              success: false, 
-              message: "sender wallet ID, receiver wallet ID and amount must be valid"
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Unauthorized to make transfer." 
             });
         }
+        const { receiverWalletId, amount, narration, txPin } = req.body;
+        if (!receiverWalletId || !amount || !txPin) {
+            return res.status(400).json({ success: false, message: `Missing required fields, enter all required information!` });
+        }
+        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(receiverWalletId) || Number.isNaN(amount) || amount < 10 || txPin.length !== 4) {
+            return res.status(400).json({ success: false, message: "sender wallet ID, receiver wallet ID amount and transfer pin must be valid"})
+        }
 
-        const [sender, receiver] = await Promise.all([
-            Wallet.findOne({ user: userId }),
+        const [sender, receiver] = await Promise.all([   
+            Wallet.findOne({ user: userId }).populate("user", "txPin"),
             Wallet.findById(receiverWalletId),
         ]);
+        console.log(sender.user);
         
-        // Null check before accessing properties
         if (!sender) {
             return res.status(404).json({ 
               success: false, 
@@ -45,7 +50,7 @@ const intraBankTransferFunds = async (req, res) => {
         if(sender._id.toString() === receiverWalletId) {
             return res.status(400).json({ success: false, message: "cannot transfer funds to the same account" })
         }
-        if (role && sender.user.toString() !== userId) {
+        if (role && sender.user._id?.toString() !== userId) {
             return res.status(401).json({ success: false, message: "Unauthorized transfer initiated" });
         } 
         if (sender.status !== "Active") {
@@ -59,18 +64,28 @@ const intraBankTransferFunds = async (req, res) => {
         }
         if (sender.balance < amount) {
             return res.status(400).json({ success: false, message: "Insufficient balance" });
-        }    
+        }
+        console.log(sender.user);
         
-        // Update balances with error handling
-        sender.balance -= amount;
-        receiver.balance += amount;
+        // check senders tx pin
+        const isValidPin = await verifyTxPin(res, sender, txPin) 
+        if (!isValidPin) {
+            return res.status(401).json({ message: "Invalid transaction PIN" });
+        }
+
+        sender.balance -= +amount;
+        receiver.balance += +amount;
         
         try {
             await Promise.all([sender.save(), receiver.save()]);
         } catch (saveErr) {
-            // Rollback balance changes on failure
-            sender.balance += amount;
-            receiver.balance -= amount;
+            sender.balance += +amount;
+            receiver.balance -= +amount;
+            try { 
+                await Promise.all([sender.save(), receiver.save()]); 
+            } catch (rollbackErr) {
+                console.error('[interBankTransfer] Rollback error:', rollbackErr);
+            }
             console.error('[intraBankTransfer] Database save error:', saveErr);
 
             return res.status(500).json({ 
@@ -79,7 +94,6 @@ const intraBankTransferFunds = async (req, res) => {
             });
         }
         
-        // Create transaction record with error handling
         let txRef;
         try {
             txRef = await generateTxRef(Transaction);
@@ -101,10 +115,9 @@ const intraBankTransferFunds = async (req, res) => {
 
         } catch (txErr) {
             console.error('[intraBankTransfer] Transaction creation error:', txErr);
-
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Transfer completed but transaction record creation failed.',
+            return res.status(201).json({
+                success: true,
+                warning: "Transfer completed but transaction record creation failed.",
                 reference: txRef
             });
         }
@@ -119,39 +132,42 @@ const intraBankTransferFunds = async (req, res) => {
     }
 }
 
-//interbank
-const interBankTransferFunds = async (req, res) => {
+// ─── interBankTransferFunds ──────────────────────────────────────
+
+exports.interBankTransferFunds = async (req, res) => {
     try {
         const { userId, role } = req;
-        const { receiverAccountNumber, amount, narration } = req.body;
-        if (!receiverAccountNumber || !amount) {
+        if (role !== 'customer') {
+            return res.status(403).json({ success: false, message: "Only a customer is make transfer" })
+        }
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Unauthorized to create a make transfer." 
+            });
+        }
+        const { receiverAccountNumber, amount, narration, txPin } = req.body;
+        if (!receiverAccountNumber || !amount || !txPin) {
             return res.status(400).json({ success: false, message: `Missing required fields, enter all required information!` });
         }
-        if (receiverAccountNumber.length !== 10 || Number.isNaN(amount) || amount < 10) {
+    if (receiverAccountNumber.length !== 10 || Number.isNaN(amount) || amount < 10 || txPin.length !== 4) {
             return res.status(400).json({ 
                 success: false,
-                message: "receiver's account number, receiver's bank code, and amount are required and amount must be valid"
+                message: "receiver's account number, receiver's bank code, amount and transaction pin are required and must be valid"
             })
         }
 
-        const sender = await Wallet.findOne({ user: userId });
+        const sender = await Wallet.findOne({ user: userId }).populate("user", "txPin");
         let receiver;
         
-        // Handle name enquiry errors
         try { 
             receiver = await nameEnquiry(receiverAccountNumber);
         } catch (err) {
             if (err.response?.status === 404) {
-                return res.status(404).json({ 
-                    success: false, 
-                    message: "Account number not found" 
-                });
+                return res.status(404).json({ success: false, message: "Account number not found" });
             }
             console.error('[interBankTransfer] Name enquiry error:', err.message);
-            return res.status(500).json({ 
-                success: false, 
-                message: err.response?.data || "Failed to verify receiver account"
-            });
+            return res.status(500).json({ success: false, message: err.response?.data || "Failed to verify receiver account" });
         }
         
         if (!sender) {
@@ -160,7 +176,7 @@ const interBankTransferFunds = async (req, res) => {
         if(!receiver) {
             return res.status(404).json({ success: false, message: "Account number not found" });
         }
-        if (role && sender?.user?.toString() !== userId) {
+        if (role && sender?.user?._id?.toString() !== userId) {
             return res.status(401).json({ success: false, message: "Unauthorized transfer initiated" });
         } 
         if (sender.status !== "Active") {
@@ -169,39 +185,44 @@ const interBankTransferFunds = async (req, res) => {
         if (sender.balance < amount) {
             return res.status(400).json({ success: false, message: "Insufficient balance" });
         }
-        
-        // Deduct amount from sender
+
+        // check senders tx pin
+        const isValidPin = await verifyTxPin(res, sender, txPin) 
+        if (!isValidPin) {
+            return res.status(401).json({ message: "Invalid transaction PIN" });
+        }
+
         sender.balance -= amount;
         try {
             await sender.save();
         } catch (saveErr) {
+            sender.balance += amount;
+            try { 
+                await sender.save(); 
+            } catch (rollbackErr) {
+                console.error('[interBankTransfer] Rollback error:', rollbackErr);
+            }
             console.error('[interBankTransfer] Sender save error:', saveErr);
             return res.status(500).json({ success: false, message: 'Failed to update sender balance' });
         }
         
-        // Process interbank transfer
         let nibssResponse;
-        const payload = {
-            from: sender.accountNumber,
-            to: receiverAccountNumber,
-            amount: Number(amount),
-        }   
+        const payload = { 
+            from: sender.accountNumber, 
+            to: receiverAccountNumber, 
+            amount: Number(amount) 
+        };
         try {
             nibssResponse = await interbankTransfer(payload);
 
         } catch (transferError) {
-            // Rollback balance on transfer failure
             sender.balance += amount;
-
-            try {
-
-                await sender.save();
-
+            try { 
+                await sender.save(); 
             } catch (rollbackErr) {
                 console.error('[interBankTransfer] Rollback error:', rollbackErr);
             }
             console.error("[interBankTransfer] NIBSS transfer error:", transferError.message || transferError);
-
             return res.status(502).json({
                 success: false,
                 message: "Transfer failed. Your balance has been restored.",
@@ -210,7 +231,6 @@ const interBankTransferFunds = async (req, res) => {
             });
         }   
 
-        // Create transaction record
         try {
             const transferDetails = await Transaction.create({
                 reference: nibssResponse.reference,
@@ -240,7 +260,9 @@ const interBankTransferFunds = async (req, res) => {
     }
 }
 
-const transactionHistory = async (req, res) => {
+// ─── transactionHistory 
+
+exports.transactionHistory = async (req, res) => {
     try {
         const reference = req.params.reference;
         if (!reference)  return res.status(400).json({ success: false, message: 'Transaction reference ID is required' });
@@ -259,7 +281,6 @@ const transactionHistory = async (req, res) => {
             
             if (!liveTx) return res.status(404).json({ success: false, message: 'Transaction not found' });
 
-            //if no tx on our db, fetch from X-API
             if (role === "customer") {
                 try {
                     const { isSender, isReceiver } = await checkTransactionOwnership(Wallet, liveTx, userId);
@@ -281,14 +302,12 @@ const transactionHistory = async (req, res) => {
             }
         }
         
-        // Transaction exists in DB
         if (role === "customer") {
             const sender = tx.senderWallet?.user;
             const receiver = tx.receiverWallet?.user;
             const isSender = sender?.toString() === userId;
             const isReceiver = receiver?.toString() === userId;
             
-            // if both are from the our bank we dont hit the x-API
             if (sender && receiver) {
                 if (!isSender && !isReceiver) {
                     return res.status(401).json({ success: false, message: "Not authorized" });
@@ -300,7 +319,6 @@ const transactionHistory = async (req, res) => {
                     return res.status(200).json({ success: true, message: `You were credited ₦${tx.amount} by another user`, data: tx });
                 }
             } else {
-                //we hit the x-API incase of any change in transaction status
                 let liveTx;
                 try {
                     liveTx = await transactionStatus(reference);
@@ -326,14 +344,12 @@ const transactionHistory = async (req, res) => {
             }
         }
         
-        // Admin / Staff
         if (["admin", "staff"].includes(role)) {
             let liveTx;
             try {
                 liveTx = await transactionStatus(reference);
             } catch (err) {
                 console.error('[transactionHistory] Admin transaction status fetch error:', err.message);
-                // Continue with DB record even if API fails
             }
             
             if (liveTx) {
@@ -347,7 +363,6 @@ const transactionHistory = async (req, res) => {
                 }
                 return res.status(200).json({ success: true, message: "Transaction fetched successfully", data: tx });
             }
-            //internal transaction history
             return res.status(200).json({ success: true, message: "Transaction fetched successfully", data: tx });
         }
     } catch (err) {
@@ -355,6 +370,163 @@ const transactionHistory = async (req, res) => {
         return res.status(500).json({ success: false, message: err?.response?.data || err.message || 'Internal server error' });
     }
 };
+
+// ─── depositFunds ─────────────────────────────────────────────────────
+exports.depositFunds = async (req, res) => {
+    try {
+        const { role } = req;
+        if (!['staff', 'admin'].includes(role)) {
+            return res.status(403).json({ success: false, message: 'Only staff or admin can process deposits' });
+        }
+
+        const { accountNumber, amount, narration } = req.body;
+
+        if (!accountNumber || !amount) {
+            return res.status(400).json({ success: false, message: 'accountNumber and amount are required' });
+        }
+        if (isNaN(amount) || amount < 10) {
+            return res.status(400).json({ success: false, message: 'Amount must be a valid number and at least ₦10' });
+        }
+
+        const wallet = await Wallet.findOne({ accountNumber });
+        if (!wallet) {
+            return res.status(404).json({ success: false, message: 'Wallet not found for the given account number' });
+        }
+        if (wallet.status !== 'Active') {
+            return res.status(403).json({ success: false, message: `Wallet is "${wallet.status}" and cannot receive deposits` });
+        }
+
+        wallet.balance += Number(amount);
+        await wallet.save();
+
+        const txRef = await generateTxRef(Transaction);
+        const transaction = await Transaction.create({
+            reference: txRef,
+            receiverWallet: wallet._id,
+            amount: Number(amount),
+            type: 'credit',
+            status: 'success',
+            narration: narration || `Cash deposit by ${req.role}`
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: `₦${amount} deposited successfully into account ${accountNumber}`,
+            data: transaction
+        });
+
+    } catch (err) {
+        console.error('[depositFunds]', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// ─── withdrawFunds ───────────────────────────────────────────────────
+exports.withdrawFunds = async (req, res) => {
+    try {
+        const { role } = req;
+        if (!['staff', 'admin'].includes(role)) {
+            return res.status(403).json({ success: false, message: 'Only staff or admin can process withdrawals' });
+        }
+
+        const { accountNumber, amount, narration } = req.body;
+
+        if (!accountNumber || !amount) {
+            return res.status(400).json({ success: false, message: 'accountNumber and amount are required' });
+        }
+        if (accountNumber.length < 10 || isNaN(amount) || amount < 10) {
+            return res.status(400).json({ success: false, message: 'Account number must be 10 or above and amount must be a valid number and at least ₦10' });
+        }
+
+        const wallet = await Wallet.findOne({ accountNumber });
+        if (!wallet) {
+            return res.status(404).json({ success: false, message: 'Wallet not found for the given account number' });
+        }
+        if (wallet.status !== 'Active') {
+            return res.status(403).json({ success: false, message: `Wallet is "${wallet.status}" and cannot process withdrawals` });
+        }
+        if (wallet.balance < Number(amount)) {
+            return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
+        }
+
+        wallet.balance -= Number(amount);
+        await wallet.save();
+
+        const txRef = await generateTxRef(Transaction);
+        const transaction = await Transaction.create({
+            reference: txRef,
+            senderWallet: wallet._id,
+            amount: Number(amount),
+            type: 'debit',
+            status: 'success',
+            narration: narration || `Withdrawal by ${req.role}`
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: `₦${amount} withdrawn successfully from account ${accountNumber}`,
+            data: transaction
+        });
+
+    } catch (err) {
+        console.error('[withdrawFunds]', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// ─── getAllTransactions ───────────────────────────────────────────────
+exports.getAllTransactions = async (req, res) => {
+    try {
+        const { userId, role } = req;
+        const { page = 1, limit = 10, type, status } = req.query;
+
+        let filter = {};
+
+        if (role === 'customer') {
+            const wallet = await Wallet.findOne({ user: userId });
+            if (!wallet) {
+                return res.status(404).json({ success: false, message: 'Wallet not found' });
+            }
+            // Show transactions where user is either the sender or the receiver
+            filter = {
+                $or: [
+                    { senderWallet: wallet._id },
+                    { receiverWallet: wallet._id }
+                ]
+            };
+        }
+
+        if (type)   filter.type   = type;
+        if (status) filter.status = status;
+
+        const skip = (Number(page) - 1) * Number(limit);
+        const [transactions, total] = await Promise.all([
+            Transaction.find(filter)
+                .populate('senderWallet', 'accountNumber user')
+                .populate('receiverWallet', 'accountNumber user')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(Number(limit)),
+            Transaction.countDocuments(filter)
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            data: transactions,
+            pagination: {
+                total,
+                page: Number(page),
+                limit: Number(limit),
+                pages: Math.ceil(total / Number(limit))
+            }
+        });
+
+    } catch (err) {
+        console.error('[getAllTransactions]', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 
 
 module.exports = { 
