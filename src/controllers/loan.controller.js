@@ -14,28 +14,40 @@ const applyLoan = async (req, res) => {
         const { amount, durationMonths, narration } = req.body;
         
         if (!userId) {
-            return res.status(401).json({ success: false, message: "Loan application unauthorized" })
+            return res.status(401).json({ 
+                success: false, 
+                message: "Loan application unauthorized" })
         }
         if (role !== 'customer') {
-            return res.status(403).json({ success: false, message: "Only a customer can apply for loan" })
+            return res.status(403).json({ 
+                success: false, 
+                message: "Only a customer can apply for loan" })
         }
 
         if (!amount || !durationMonths) {
-            return res.status(400).json({ success: false, message: 'amount and durationMonths are required' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'amount and durationMonths are required' });
         }
         if (amount < 1000) {
             return res.status(400).json({ success: false, message: 'Minimum loan amount is ₦1,000' });
         }
         if (durationMonths < 1 || durationMonths > 60) {
-            return res.status(400).json({ success: false, message: 'Loan duration must be between 1 and 60 months' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Loan duration must be between 1 and 60 months' });
         }
 
         const wallet = await Wallet.findOne({ user: userId });
         if (!wallet) {
-            return res.status(404).json({ success: false, message: 'Wallet not found. Create a wallet first.' });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Wallet not found. Create a wallet first.' });
         }
         if (wallet.status !== 'Active') {
-            return res.status(403).json({ success: false, message: `Wallet is "${wallet.status}". Cannot apply for a loan.` });
+            return res.status(403).json({ 
+                success: false, 
+                message: `Wallet is "${wallet.status}". Cannot apply for a loan.` });
         }
 
         // Prevent stacking loans — one pending or active loan at a time
