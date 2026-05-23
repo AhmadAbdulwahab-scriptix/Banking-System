@@ -28,14 +28,20 @@ const registerCustomer = async (req, res) => {
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Password must be at least 8 characters' });
         }
 
         if (kycType === 'NIN' && !nin) {
-            return res.status(400).json({ success: false, message: 'NIN is required when kycType is "NIN"' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'NIN is required when kycType is "NIN"' });
         }
         if (kycType === 'BVN' && !bvn) {
-            return res.status(400).json({ success: false, message: 'BVN is required when kycType is "BVN"' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'BVN is required when kycType is "BVN"' });
         }
 
         // Duplicate check
@@ -50,12 +56,16 @@ const registerCustomer = async (req, res) => {
             if (email && existing.email === email.toLowerCase()) field = 'email';
             else if (nin && existing.nin === nin)                 field = 'nin';
             else if (bvn && existing.bvn === bvn)                field = 'bvn';
-            return res.status(409).json({ success: false, message: `An account with this ${field} already exists` });
+            return res.status(409).json({ 
+                success: false, 
+                message: `An account with this ${field} already exists` });
         }
 
         const securedPassword = await hashPassword(password);
         if (!securedPassword) {
-            return res.status(500).json({ success: false, message: 'Error hashing password' });
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Error hashing password' });
         }
 
         const user = new User({
@@ -84,10 +94,14 @@ const registerCustomer = async (req, res) => {
     } catch (err) {
         if (err.code === 11000) {
             const field = Object.keys(err.keyPattern || {})[0] || 'field';
-            return res.status(409).json({ success: false, message: `An account with this ${field} already exists` });
+            return res.status(409).json({ 
+                success: false, 
+                message: `An account with this ${field} already exists` });
         }
         console.error('[register]', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' });
     }
 };
 
@@ -262,23 +276,29 @@ const registerAdmin = async (req, res) => {
     }
 };
 
-// ─── POST /api/auth/login ───────────────────────────────────────────────────
+// ─── POST /api/auth/login 
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'Email and password are required' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Email and password are required' });
         }
 
         const user = await User.findOne({ email }).select('+password');
         if (!user) {
-            return res.status(401).json({ success: false, message: 'Email and password do not match' });
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Email and password do not match' });
         }
 
         const isMatch = await comparePassword(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Email and password do not match' });
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Email and password do not match' });
         }
 
         const { accessToken, refreshToken } = issueTokens(res, user);
@@ -301,7 +321,8 @@ const login = async (req, res) => {
     }
 };
 
-// ─── POST /api/auth/refresh ─────────────────────────────────────────────────
+// POST /api/auth/refresh 
+
 const refreshToken = async (req, res) => {
     try {
         const token = req.cookies?.refreshToken;
@@ -413,7 +434,9 @@ const updateUserInfo = async (req, res) => {
         const { firstName, lastName, email, phone } = req.body;
 
         if (!firstName && !lastName && !email && !phone) {
-            return res.status(400).json({ success: false, message: 'Provide at least one field to update' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Provide at least one field to update' });
         }
         if (email || phone) {
             const orConditions = [];
@@ -422,7 +445,9 @@ const updateUserInfo = async (req, res) => {
             const conflict = await User.findOne({ $or: orConditions, _id: { $ne: userId } });
             if (conflict) {
                 const field = email && conflict.email === email.toLowerCase() ? 'email' : 'phone';
-                return res.status(409).json({ success: false, message: `This ${field} is already in use` });
+                return res.status(409).json({ 
+                    success: false, 
+                    message: `This ${field} is already in use` });
             }
         }
 
@@ -455,4 +480,12 @@ const updateUserInfo = async (req, res) => {
     }
 };
 
-module.exports = { registerCustomer, login, refreshToken, logout, resetPassword, updateUserInfo };
+module.exports = {
+     registerCustomer, 
+     registerAdmin,
+     registerStaff,
+    login, 
+    refreshToken, 
+    logout, 
+    resetPassword, 
+    updateUserInfo };

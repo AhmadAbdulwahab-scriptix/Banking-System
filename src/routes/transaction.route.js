@@ -12,7 +12,7 @@ const {
 router.post("/interbank-transfer", interBankTransferFunds);
 router.post("/intrabank-transfer", intraBankTransferFunds);
 
-router.get("/all", getAllTransactions);
+router.get("/", getAllTransactions);
 
 router.get("/history/:reference", transactionHistory);
 

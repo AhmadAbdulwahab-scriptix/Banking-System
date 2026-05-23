@@ -11,12 +11,12 @@ const {
 
 // Customer routes
 router.post("/apply", applyLoan);
-router.post("/:loanId/repay", repayLoan);
+router.post("/repay/:loanId", repayLoan);
 router.get("/my-loans", getMyLoans);
 
 // Staff/Admin routes (role check is inside the controller)
-router.get("/all", getAllLoans);
-router.post("/:loanId/approve", approveLoan);
-router.post("/:loanId/reject", rejectLoan);
+router.get("/admin/all", getAllLoans);
+router.post("/admin/approve/:loanId", approveLoan);
+router.post("/admin/reject/:loanId", rejectLoan);
 
 module.exports = router;

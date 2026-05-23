@@ -9,10 +9,13 @@ const mongoose = require('mongoose')
 
 exports.intraBankTransferFunds = async (req, res) => {
     try {
-        const { userId, role } = req;
+        const { userId, role } = req
         
         if (role !== 'customer') {
-            return res.status(403).json({ success: false, message: "Only a customer is allowed to make transfer" })
+            return res.status(403).json({ 
+                success: false, 
+                message: "Only a customer is allowed to make transfer" 
+            })
         }
         if (!userId) {
             return res.status(401).json({ 
@@ -22,10 +25,19 @@ exports.intraBankTransferFunds = async (req, res) => {
         }
         const { receiverWalletId, amount, narration, txPin } = req.body;
         if (!receiverWalletId || !amount || !txPin) {
-            return res.status(400).json({ success: false, message: `Missing required fields, enter all required information!` });
+            return res.status(400).json({ 
+                success: false, 
+                message: `Missing required fields, enter all required information!` });
         }
-        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(receiverWalletId) || Number.isNaN(amount) || amount < 10 || txPin.length !== 4) {
-            return res.status(400).json({ success: false, message: "sender wallet ID, receiver wallet ID amount and transfer pin must be valid"})
+
+        if (!mongoose.Types.ObjectId.isValid(userId) || 
+        !mongoose.Types.ObjectId.isValid(receiverWalletId) ||
+         Number.isNaN(Number(amount)) || amount < 10 || txPin.length !== 4) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "sender wallet ID, receiver wallet ID amount and transfer pin must be valid",
+                errorStack: new Error("Invalid input data").stack             
+            })
         }
 
         const [sender, receiver] = await Promise.all([   
@@ -48,16 +60,24 @@ exports.intraBankTransferFunds = async (req, res) => {
             });
         }
         if(sender._id.toString() === receiverWalletId) {
-            return res.status(400).json({ success: false, message: "cannot transfer funds to the same account" })
+            return res.status(400).json({ 
+                success: false, 
+                message: "cannot transfer funds to the same account" })
         }
         if (role && sender.user._id?.toString() !== userId) {
-            return res.status(401).json({ success: false, message: "Unauthorized transfer initiated" });
+            return res.status(401).json({ 
+                success: false,
+                 message: "Unauthorized transfer initiated" });
         } 
         if (sender.status !== "Active") {
-            return res.status(403).json({ success: false, message: `Sender wallet is "${sender.status}" and cannot initiate transfers.` });
+            return res.status(403).json({ 
+                success: false, 
+                message: `Sender wallet is "${sender.status}" and cannot initiate transfers.` });
         }
         if (receiver.status !== "Active") { 
-            return res.status(403).json({ success: false, message: `Receiver wallet is "${receiver.status}" and cannot receive funds.` });
+            return res.status(403).json({ 
+                success: false, 
+                message: `Receiver wallet is "${receiver.status}" and cannot receive funds.` });
         }
         if (sender.currency !== receiver.currency) {
             return res.status(422).json({ success: false, message: `Currency mismatch: ${sender.currency} → ${receiver.currency}. Cross-currency transfers are not supported.` });
@@ -147,10 +167,15 @@ exports.interBankTransferFunds = async (req, res) => {
             });
         }
         const { receiverAccountNumber, amount, narration, txPin } = req.body;
+
         if (!receiverAccountNumber || !amount || !txPin) {
-            return res.status(400).json({ success: false, message: `Missing required fields, enter all required information!` });
+            return res.status(400).json({ 
+                success: false, 
+                message: `Missing required fields, enter all required information!` 
+            });
         }
-    if (receiverAccountNumber.length !== 10 || Number.isNaN(amount) || amount < 10 || txPin.length !== 4) {
+    if (receiverAccountNumber.length !== 10 || 
+        Number.isNaN(Number(amount)) || amount < 10 || txPin.length !== 4) {
             return res.status(400).json({ 
                 success: false,
                 message: "receiver's account number, receiver's bank code, amount and transaction pin are required and must be valid"
@@ -374,26 +399,36 @@ exports.transactionHistory = async (req, res) => {
 // ─── depositFunds ─────────────────────────────────────────────────────
 exports.depositFunds = async (req, res) => {
     try {
-        const { role } = req;
-        if (!['staff', 'admin'].includes(role)) {
-            return res.status(403).json({ success: false, message: 'Only staff or admin can process deposits' });
-        }
+        const { userId } = req;
+        // if (!['staff', 'admin'].includes(role)) {
+        //     return res.status(403).json({ 
+        //         success: false, 
+        //         message: 'Only staff or admin can process deposits' });
+        // }
 
         const { accountNumber, amount, narration } = req.body;
 
         if (!accountNumber || !amount) {
-            return res.status(400).json({ success: false, message: 'accountNumber and amount are required' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'accountNumber and amount are required' });
         }
         if (isNaN(amount) || amount < 10) {
-            return res.status(400).json({ success: false, message: 'Amount must be a valid number and at least ₦10' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Amount must be a valid number and at least ₦10' });
         }
 
         const wallet = await Wallet.findOne({ accountNumber });
         if (!wallet) {
-            return res.status(404).json({ success: false, message: 'Wallet not found for the given account number' });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Wallet not found for the given account number' });
         }
         if (wallet.status !== 'Active') {
-            return res.status(403).json({ success: false, message: `Wallet is "${wallet.status}" and cannot receive deposits` });
+            return res.status(403).json({ 
+                success: false, 
+                message: `Wallet is "${wallet.status}" and cannot receive deposits` });
         }
 
         wallet.balance += Number(amount);
@@ -406,7 +441,7 @@ exports.depositFunds = async (req, res) => {
             amount: Number(amount),
             type: 'credit',
             status: 'success',
-            narration: narration || `Cash deposit by ${req.role}`
+            narration: narration || `Cash deposit by ${userId}`
         });
 
         return res.status(201).json({
@@ -424,10 +459,10 @@ exports.depositFunds = async (req, res) => {
 // ─── withdrawFunds ───────────────────────────────────────────────────
 exports.withdrawFunds = async (req, res) => {
     try {
-        const { role } = req;
-        if (!['staff', 'admin'].includes(role)) {
-            return res.status(403).json({ success: false, message: 'Only staff or admin can process withdrawals' });
-        }
+        const { userId } = req;
+        // if (!['staff', 'admin'].includes(role)) {
+        //     return res.status(403).json({ success: false, message: 'Only staff or admin can process withdrawals' });
+        // }
 
         const { accountNumber, amount, narration } = req.body;
 

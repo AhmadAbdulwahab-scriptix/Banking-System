@@ -11,7 +11,9 @@ const setTxPin = async (req, res) => {
     try {
         const { userId, role } = req;
         if (role !== 'customer') {
-            return res.status(403).json({ success: false, message: "Only a customer is allowed to create transaction pin" })
+            return res.status(403).json({ 
+                success: false, 
+                message: "Only a customer is allowed to create transaction pin" })
         }
         if (!userId) {
             return res.status(401).json({ 
@@ -21,10 +23,14 @@ const setTxPin = async (req, res) => {
         }
         const { pin } = req.body;
         if (!pin) {
-            return res.status(400).json({ success: false, message: 'PIN is required' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'PIN is required' });
         }
         if (!/^\d{4}$/.test(pin)) {
-            return res.status(400).json({ success: false, message: 'PIN must be exactly 4 digits' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'PIN must be exactly 4 digits' });
         }
 
         const [user, wallet] = await Promise.all([
@@ -33,10 +39,14 @@ const setTxPin = async (req, res) => {
         ]);
 
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' });
         }
         if (!wallet) {
-            return res.status(401).json({ success: false, message: "User must have an account to create transation pin "})
+            return res.status(401).json({ 
+                success: false, 
+                message: "User must have an account to create transaction pin "})
         }
         if (user.txPin) {
             return res.status(409).json({
@@ -48,11 +58,15 @@ const setTxPin = async (req, res) => {
         user.txPin = await hashPin(pin);
         await user.save();
 
-        return res.status(200).json({ success: true, message: 'Transaction PIN set successfully' });
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Transaction PIN set successfully' });
 
     } catch (err) {
         console.error('[setTxPin]', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' });
     }
 };
 
@@ -65,7 +79,9 @@ const changeTxPin = async (req, res) => {
     try {
         const { userId, role } = req;
         if (role !== 'customer') {
-            return res.status(403).json({ success: false, message: "Only a customer is allowed to change transaction pin" })
+            return res.status(403).json({ 
+                success: false, 
+                message: "Only a customer is allowed to change transaction pin" })
         }
         if (!userId) {
             return res.status(401).json({ 
@@ -76,13 +92,19 @@ const changeTxPin = async (req, res) => {
 
         const { currentPin, newPin } = req.body;
         if (!currentPin || !newPin) {
-            return res.status(400).json({ success: false, message: 'currentPin and newPin are required' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'currentPin and newPin are required' });
         }
         if (!/^\d{4}$/.test(newPin)) {
-            return res.status(400).json({ success: false, message: 'New PIN must be exactly 4 digits' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'New PIN must be exactly 4 digits' });
         }
         if (currentPin === newPin) {
-            return res.status(400).json({ success: false, message: 'New PIN must be different from current PIN' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'New PIN must be different from current PIN' });
         }
 
         const [user, wallet] = await Promise.all([
@@ -91,10 +113,14 @@ const changeTxPin = async (req, res) => {
         ]);
 
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' });
         }
         if (!wallet) {
-            return res.status(401).json({ success: false, message: "User must have an account to create transation pin "})
+            return res.status(401).json({ 
+                success: false, 
+                message: "User must have an account to create transation pin "})
         }
         if (!user.txPin) {
             return res.status(400).json({
@@ -105,17 +131,23 @@ const changeTxPin = async (req, res) => {
 
         const isMatch = await comparePin(currentPin, user.txPin);
         if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Current PIN is incorrect' });
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Current PIN is incorrect' });
         }
 
         user.txPin = await hashPin(newPin);
         await user.save();
 
-        return res.status(200).json({ success: true, message: 'Transaction PIN changed successfully' });
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Transaction PIN changed successfully' });
 
     } catch (err) {
         console.error('[changeTxPin]', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' });
     }
 };
 
@@ -126,7 +158,10 @@ const changeTxPin = async (req, res) => {
  */
 const verifyTxPin = async (res, sender, pin) => {
     if (!sender?.user?.txPin) {        
-        return res.status(400).json({ success: false, message: "Sender doesn't have transaction pin set, click set transaction pin!" })
+        return res.status(400).json({ 
+            success: false, 
+            message: "Sender doesn't have transaction pin set, click set transaction pin!" 
+        })
     };
     console.log(pin, sender.user.txPin);
     

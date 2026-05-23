@@ -71,3 +71,9 @@
 {"level":"error","message":"404 - Route /api/loan/:loanId/approve Not Found - /api/loan/:loanId/approve - GET - ::1","service":"src","timestamp":"2026-05-20T05:16:21.195Z"}
 {"level":"error","message":"401 - Authorization token missing - /api/loan/all - GET - ::1","service":"src","timestamp":"2026-05-20T05:22:19.043Z"}
 {"level":"error","message":"401 - Authorization token missing - /api/loan/all - GET - ::1","service":"src","timestamp":"2026-05-20T05:22:54.357Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/reject - POST - ::1","service":"src","timestamp":"2026-05-22T11:11:48.368Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/approve - POST - ::1","service":"src","timestamp":"2026-05-22T11:11:59.344Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/loan/admin/all - GET - ::1","service":"src","timestamp":"2026-05-22T11:16:12.767Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/auth/reset-password - POST - ::1","service":"src","timestamp":"2026-05-22T14:18:50.868Z"}
+{"level":"error","message":"404 - Route /api/auth/change-tx-pin Not Found - /api/auth/change-tx-pin - POST - ::1","service":"src","timestamp":"2026-05-22T14:21:54.505Z"}
+{"level":"error","message":"401 - Authorization token missing - /api/auth/change-tx-pin - PATCH - ::1","service":"src","timestamp":"2026-05-22T14:22:50.372Z"}

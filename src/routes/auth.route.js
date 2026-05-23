@@ -1,18 +1,29 @@
 const express = require("express");
 const router = express.Router();
-const { registerCustomer, login, refreshToken, logout, resetPassword, updateUserInfo } = require("../controllers/auth.controller");
+const { 
+    registerCustomer, 
+    registerStaff,
+    registerAdmin,
+     login, 
+     refreshToken, 
+     logout, 
+     resetPassword, 
+     updateUserInfo } = require("../controllers/auth.controller");
 const { setTxPin, changeTxPin } = require("../controllers/txPin.controller");
 const { verifyJWT } = require("../middleware/verify.jwt");
 
-// ── Public routes (no token required) ──────────────────────────────────────
-router.post("/register", registerCustomer);
+// Public routes (no token required) 
+// router.post("/register", registerCustomer);
+router.post("/register-customer", registerCustomer);
+router.post("/register-staff", verifyJWT, registerStaff)
+router.post("/register-admin", verifyJWT, registerAdmin)
 
 router.post("/login", login);
 
 // /refresh
 router.post("/refresh", refreshToken);
 
-// ── Protected routes ────────────────────────
+// Protected routes 
 // /logout
 router.post("/logout", verifyJWT, logout);
 

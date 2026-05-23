@@ -7,7 +7,7 @@ const {
 
 const Wallet  = require("../models/Wallet.model"); 
 const User = require('../models/User.model')
-const mogoose = require('mongoose')
+const mongoose = require('mongoose')
 
 /**
  * POST /wallets
@@ -129,7 +129,9 @@ const verifyBVN = async (req, res) => {
   try {
     const { userId, role } = req;
     if (role !== 'customer') {
-      return res.status(403).json({ success: false, message: "Only a customer is allowed to create a wallet" })
+      return res.status(403).json({ 
+        success: false, 
+        message: "Only a customer is allowed to verify BVN" })
     }
     if (!userId) {
       return res.status(401).json({ 
@@ -393,7 +395,9 @@ const getWallet = async (req, res) => {
   try {
     const { role, userId } = req;
     if (role !== 'customer') {
-      return res.status(403).json({ success: false, message: "Only a customer is allowed to get wallet details" })
+      return res.status(403).json({ 
+        success: false, 
+        message: "Only a customer is allowed to get wallet details" })
     };
     if (!userId) {
       return res.status(401).json({ 
@@ -611,12 +615,12 @@ const getAllWallets = async (req, res) => {
  */
 const approveBVN = async (req, res) => {
   try {
-    if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Only staff or admin can approve BVN'
-      });
-    }
+    // if (!['staff', 'admin', 'super-admin'].includes(req.role)) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: 'Only staff or admin can approve BVN'
+    //   });
+    // }
     const { walletId } = req.params;
 
     if (!walletId || !mongoose.Types.ObjectId.isValid(walletId)) {
@@ -625,7 +629,7 @@ const approveBVN = async (req, res) => {
     // Fetch the user to confirm they have a BVN on record
     let wallet;
     try {
-      wallet = await Wallet.findById(walletId).populate("user", "kycType");
+      wallet = await Wallet.findById(walletId).populate("user", "kycType firstName lastName");
     } catch (walletErr) {
       console.error('[approveBVN] Wallet fetch failed:', walletErr.message);
       throw walletErr;
@@ -636,7 +640,7 @@ const approveBVN = async (req, res) => {
     if (wallet?.user?.kycType !== 'BVN') {
       return res.status(400).json({
         success: false,
-        message: `User's KYC type is "${user.kycType}", not BVN`
+        message: `User's KYC type is "${wallet.user.kycType}", not BVN`
       });
     }
     if (wallet.status === 'Active') {
@@ -650,11 +654,11 @@ const approveBVN = async (req, res) => {
     }
 
     // Mark user as verified and activate wallet
-    user.isVerified = true;
+    wallet.user.isVerified = true;
     wallet.status = 'Active';
 
     try {
-      await Promise.all([user.save(), wallet.save()]);
+      await Promise.all([wallet.user.save(), wallet.save()]);
     } catch (saveErr) {
       console.error('[approveBVN] Save failed:', saveErr.message);
       throw saveErr;
@@ -662,8 +666,8 @@ const approveBVN = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `BVN approved for ${user.firstName} ${user.lastName}. Wallet is now active.`,
-      data: { wallet, userId: user._id }
+      message: `BVN approved for ${wallet.user.firstName} ${wallet.user.lastName}. Wallet is now active.`,
+      data: { wallet, userId: wallet.user._id }
     });
 
   } catch (error) {
