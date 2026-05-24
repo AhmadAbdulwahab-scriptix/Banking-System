@@ -1,4 +1,4 @@
-# NibssByPhoenix - Digital Wallet & Payment Processing System
+# Overview of NibssByPhoenix - Digital Wallet & Payment Processing System
 
 A secure and scalable Digital Wallet and Payment Processing System built with Node.js, Express.js, MongoDB, and JWT Authentication.
 
@@ -88,9 +88,7 @@ The system allows users to:
 - npm run dev
 - npm start
 
-
 ---
-
 # Project Structure
 
 ```bash
@@ -134,3 +132,21 @@ src/
 │    └── helper.utils.js
 │
 └── app.js
+
+
+CAPSTONE  PROJECT TOPIC : Real Banking system (Nibbsbyphoneix) 🏦
+
+Team Members
+
+1. CLINTON TUBOMINA CLINTON
+2. OJO KEHINDE ENOCH
+3. OLLA MICHAEL OLUWAFEMI
+4. ABIDAN SAMSON
+5. AHMED ABDULWAHAB
+6. DAVID UBAH
+7. Victor Wesley
+8. Gasper Samuel
+9. Mercy Adung
+10. Ogunfuwa Imoleayo
+11. Gladstone Eli
+12. Ehinmetan Hannah
